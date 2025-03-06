@@ -34,7 +34,173 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      department: {
+        Row: {
+          created_at: string
+          id: string
+          name: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string | null
+        }
+        Relationships: []
+      }
+      rating: {
+        Row: {
+          comment: string | null
+          created_at: string
+          department_id: string | null
+          id: string
+          rating: number | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          department_id?: string | null
+          id?: string
+          rating?: number | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          department_id?: string | null
+          id?: string
+          rating?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rating_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "department"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      role: {
+        Row: {
+          created_at: string
+          id: string
+          name: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string | null
+        }
+        Relationships: []
+      }
+      session: {
+        Row: {
+          created_at: string
+          expiration_date: string | null
+          id: string
+          token: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          expiration_date?: string | null
+          id?: string
+          token?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          expiration_date?: string | null
+          id?: string
+          token?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stress: {
+        Row: {
+          created_at: string
+          department_id: string | null
+          id: string
+          stress: number | null
+        }
+        Insert: {
+          created_at?: string
+          department_id?: string | null
+          id?: string
+          stress?: number | null
+        }
+        Update: {
+          created_at?: string
+          department_id?: string | null
+          id?: string
+          stress?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stress_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "department"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          name: string | null
+          password: string | null
+          role_id: string | null
+          surname: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          password?: string | null
+          role_id?: string | null
+          surname?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          password?: string | null
+          role_id?: string | null
+          surname?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "role"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "db-pull-types": "supabase gen types typescript --local > supabase/types/database.types.ts",
-    "db-pull": "supabase db pull --schema auth,storage --local"
+    "db-pull": "supabase db pull --local",
+    "db-merge": "supabase db pull --schema auth,storage --local"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",
