@@ -140,18 +140,21 @@ export type Database = {
           department_id: string | null
           id: string
           stress: number | null
+          user_id: string | null
         }
         Insert: {
           created_at?: string
           department_id?: string | null
           id?: string
           stress?: number | null
+          user_id?: string | null
         }
         Update: {
           created_at?: string
           department_id?: string | null
           id?: string
           stress?: number | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -159,6 +162,13 @@ export type Database = {
             columns: ["department_id"]
             isOneToOne: false
             referencedRelation: "department"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stress_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user"
             referencedColumns: ["id"]
           },
         ]

@@ -8,6 +8,7 @@ export async function getUserAction() {
 
   try {
     const userDataQuery = supabase.from("user").select();
+
     const { data, error } = await userDataQuery;
 
     if (error) throw error;
