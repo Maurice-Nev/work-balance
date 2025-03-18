@@ -39,13 +39,6 @@ export default function RootLayout({
           >
             <Toaster />
             {children}
-            <ModeToggle />
-            <LogoutButton
-              className="absolute top-4 right-4"
-              variant={"outline"}
-            >
-              Logout
-            </LogoutButton>
           </ThemeProvider>
         </TranstackReactQueryProvider>
       </body>

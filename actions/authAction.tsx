@@ -1,14 +1,16 @@
 "use server";
 
 import { createClient } from "@/supabase/server";
-import { NewSession, NewUser, User } from "@/supabase/types/database.models";
+import {
+  NewSession,
+  NewUser,
+  Role,
+  User,
+} from "@/supabase/types/database.models";
 import { v4 as uuidv4 } from "uuid";
 
 import { cookies } from "next/headers";
-import Error from "next/error";
 import bcrypt from "bcryptjs";
-
-// logout
 
 // done
 
@@ -19,11 +21,20 @@ import bcrypt from "bcryptjs";
 // update session
 // Login
 // validateUserSession
+// logout
 
 export async function register({ newUser }: { newUser: NewUser }) {
   const supabase = await createClient();
 
   try {
+    if (!newUser.password) {
+      throw {
+        name: "auth",
+        message: "no password got submitted",
+        statusCode: 500,
+      };
+    }
+
     const { data: roleData, error: roleError } = await supabase
       .from("role")
       .select()
@@ -33,10 +44,15 @@ export async function register({ newUser }: { newUser: NewUser }) {
     if (roleError) {
       throw roleError;
     }
+
+    const hashedPassword = await bcrypt.hash(newUser.password, 10);
+
     newUser = {
       ...newUser,
       role_id: roleData.id,
+      password: hashedPassword,
     };
+
     const { data: createUserData, error: createUserError } = await supabase
       .from("user")
       .insert(newUser)
@@ -150,7 +166,7 @@ export async function getUserByEmail({
   }
 }
 
-export async function getUserByToken(): Promise<User | null> {
+export async function getUserByToken() {
   const supabase = await createClient();
   const cookie = await cookies();
 
@@ -220,7 +236,7 @@ export async function createSession({ user_id }: { user_id: string }) {
     path: "/",
   };
 
-  const { data: createSessionData, error: createSessionError } = await supabase
+  const { error: createSessionError } = await supabase
     .from("session")
     .insert(newSession)
     .select()
@@ -267,10 +283,7 @@ export async function updateSession() {
   return { error: false };
 }
 
-export async function validateUserSession(): Promise<{
-  user?: User;
-  authorized: boolean;
-}> {
+export async function validateUserSession() {
   const cookie = await cookies();
 
   try {

@@ -11,12 +11,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
-export function ModeToggle() {
+export function ModeToggle(props: React.HTMLAttributes<HTMLDivElement>) {
   const { setTheme } = useTheme();
 
   return (
-    <div className="absolute top-4 left-4">
+    <div className={cn(props.className)}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="icon">

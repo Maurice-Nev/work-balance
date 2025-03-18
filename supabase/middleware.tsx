@@ -64,5 +64,9 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  if (user?.user?.role?.name) {
+    supabaseResponse.headers.set("X-User-Role", user.user.role.name);
+  }
+
   return supabaseResponse;
 }

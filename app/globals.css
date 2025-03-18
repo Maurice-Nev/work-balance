@@ -144,3 +144,7 @@
     @apply bg-background text-foreground;
   }
 }
+
+.h-screen-minus-header {
+  min-height: calc(100vh - 165px);
+}

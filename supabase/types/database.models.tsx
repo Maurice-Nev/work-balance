@@ -20,3 +20,9 @@ export type UpdateDepartment = TablesUpdate<"department">;
 export type UpdateSession = TablesUpdate<"session">;
 export type UpdateStress = TablesUpdate<"stress">;
 export type UpdateRating = TablesUpdate<"rating">;
+
+export enum RoleEnum {
+  "User",
+  "Admin",
+  "Superadmin",
+}
