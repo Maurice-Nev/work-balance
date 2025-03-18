@@ -13,10 +13,14 @@ import EmailInput from "@/components/formInputs/EmailInput";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { Form } from "@/components/ui/form";
 import PasswordInput from "@/components/formInputs/PasswordInput";
-import { LoginFormSchema, onLoginSubmit } from "./formLogics/loginLogic";
+
+import { toast } from "sonner";
+import bcrypt from "bcryptjs";
+import { useLogin } from "@/hooks/useAuth";
+import { LoginFormSchema } from "./validation/loginVal";
+import { QueryClient } from "@tanstack/react-query";
 
 export const LoginForm = ({ className, ...props }: any) => {
   const form = useForm<z.infer<typeof LoginFormSchema>>({
@@ -26,6 +30,40 @@ export const LoginForm = ({ className, ...props }: any) => {
       password: "",
     },
   });
+
+  const { mutate: loginMutation, isPending } = useLogin();
+
+  // 🟢 Funktion zum Verschlüsseln eines Passworts
+  async function hashPassword(password: string) {
+    const salt = await bcrypt.genSalt(10); // `10` entspricht der Sicherheit von `gen_salt('bf')`
+    return await bcrypt.hash(password, salt);
+  }
+  const queryClient = new QueryClient();
+
+  async function onSubmit(data: z.infer<typeof LoginFormSchema>) {
+    loginMutation(
+      { email: data.email, password: data.password },
+      {
+        onSuccess: (res) => {
+          if (res) {
+            toast.success("Erfolgreich eingeloggt!", {
+              description: <pre>{JSON.stringify(res, null, 2)}</pre>,
+            });
+            queryClient.invalidateQueries();
+          } else {
+            toast.error("Login fehlgeschlagen", {
+              description: <pre>{JSON.stringify(res, null, 2)}</pre>,
+            });
+          }
+        },
+        onError: (err) => {
+          toast.error("Login fehlgeschlagen", {
+            description: <pre>{JSON.stringify(err, null, 2)}</pre>,
+          });
+        },
+      }
+    );
+  }
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -37,7 +75,7 @@ export const LoginForm = ({ className, ...props }: any) => {
         <CardContent>
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(onLoginSubmit)}
+              onSubmit={form.handleSubmit(onSubmit)}
               className="w-full space-y-6"
             >
               <EmailInput

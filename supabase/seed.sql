@@ -5,7 +5,14 @@ INSERT INTO role (id, name, created_at) VALUES
 ON CONFLICT (id) DO NOTHING;
 
 
-INSERT INTO "user" (id, email, password, name, surname, role_id, created_at) VALUES
-  (gen_random_uuid(), 'admin@admin.com', crypt('liwasabo', gen_salt('bf')), 'Super', 'Admin', 
-   (SELECT id FROM role WHERE name = 'Superadmin' LIMIT 1), NOW())
+INSERT INTO "user" (id, email, password, name, surname, role_id, created_at) 
+VALUES (
+  gen_random_uuid(), 
+  'admin@admin.com', 
+  crypt('liwasabo', gen_salt('bf', 10)),  -- Verschlüsselung direkt in SQL
+  'Super', 
+  'Admin', 
+  (SELECT id FROM role WHERE name = 'Superadmin' LIMIT 1), 
+  NOW()
+)
 ON CONFLICT (email) DO NOTHING;

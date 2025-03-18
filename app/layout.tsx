@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/general/themeProvider";
 import { TranstackReactQueryProvider } from "@/components/general/transtackReactQueryProvider";
 import { ModeToggle } from "@/components/general/modeToggle";
 import { Toaster } from "@/components/ui/sonner";
+import { LogoutButton } from "@/features/auth/components/logoutButton";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,6 +40,12 @@ export default function RootLayout({
             <Toaster />
             {children}
             <ModeToggle />
+            <LogoutButton
+              className="absolute top-4 right-4"
+              variant={"outline"}
+            >
+              Logout
+            </LogoutButton>
           </ThemeProvider>
         </TranstackReactQueryProvider>
       </body>

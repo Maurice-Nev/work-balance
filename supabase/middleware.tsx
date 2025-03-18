@@ -1,13 +1,15 @@
+// import { validateSessionAction } from "@/actions/sessionAction";
+// import { checkSession } from "@/actions/authAction";
+import { validateUserSession } from "@/actions/authAction";
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-// 🟢 Definiere eine Liste mit öffentlichen Seiten
-const publicRoutes = ["/", "/login", "/register", "/about", "/contact"];
-
 export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
+  let supabaseResponse = NextResponse.next({
+    request,
+  });
 
-  const supabase = createServerClient(
+  createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -19,7 +21,9 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value, options }) =>
             request.cookies.set(name, value)
           );
-          supabaseResponse = NextResponse.next({ request });
+          supabaseResponse = NextResponse.next({
+            request,
+          });
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           );
@@ -28,19 +32,35 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Do not run code between createServerClient and supabase.auth.getUser()
+  const user = await validateUserSession();
+  const publicRoutes = [
+    "/",
+    "/about",
+    "/contact",
+    "/api/public",
+    "/login",
+    "/register",
+  ];
 
-  const pathname = request.nextUrl.pathname;
+  const protectedAuthRoutes = ["/login", "/register"];
 
-  if (publicRoutes.includes(pathname)) {
-    return supabaseResponse;
-  }
+  const isPublicRoute = publicRoutes.includes(request.nextUrl.pathname);
 
-  if (!user) {
+  if (!user.authorized && !isPublicRoute) {
+    // Kein Benutzer vorhanden und Route ist nicht public -> Umleitung zur Login-Seite
     const url = request.nextUrl.clone();
     url.pathname = "/login";
+    return NextResponse.redirect(url);
+  }
+
+  const isProtectedAuthRoute = protectedAuthRoutes.includes(
+    request.nextUrl.pathname
+  );
+
+  if (user.authorized && isProtectedAuthRoute) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/";
     return NextResponse.redirect(url);
   }
 

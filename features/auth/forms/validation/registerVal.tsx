@@ -1,4 +1,3 @@
-import { toast } from "sonner";
 import { z } from "zod";
 
 export const RegisterFormSchema = z.object({
@@ -15,13 +14,3 @@ export const RegisterFormSchema = z.object({
     message: "Password must be at least 6 characters.",
   }),
 });
-
-export function onRegisterSubmit(data: z.infer<typeof RegisterFormSchema>) {
-  toast("You submitted the following values:", {
-    description: (
-      <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-        <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-      </pre>
-    ),
-  });
-}

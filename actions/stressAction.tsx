@@ -79,9 +79,13 @@ export async function createStressAction(newStress: NewStress) {
   const supabase = await createClient();
 
   try {
-    const { error } = await supabase.from("stress").insert(newStress);
+    const { data, error } = await supabase
+      .from("stress")
+      .insert(newStress)
+      .select()
+      .single();
     if (error) throw error;
-    return { success: true };
+    return data as Stress;
   } catch (error) {
     throw error;
   }

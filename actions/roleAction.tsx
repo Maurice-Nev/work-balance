@@ -37,13 +37,13 @@ export async function createRoleAction(newRole: NewRole) {
   const supabase = await createClient();
 
   try {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("role")
       .insert(newRole)
       .select()
       .single();
     if (error) throw error;
-    return { success: true };
+    return data as Role;
   } catch (error) {
     throw error;
   }

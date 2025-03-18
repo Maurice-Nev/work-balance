@@ -45,9 +45,13 @@ export async function createDepartmentAction(newDepartment: NewDepartment) {
   const supabase = await createClient();
 
   try {
-    const { error } = await supabase.from("department").insert(newDepartment);
+    const { data, error } = await supabase
+      .from("department")
+      .insert(newDepartment)
+      .select()
+      .single();
     if (error) throw error;
-    return { success: true };
+    return data as Department;
   } catch (error) {
     throw error;
   }

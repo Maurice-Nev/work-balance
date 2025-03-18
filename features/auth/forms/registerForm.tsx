@@ -17,10 +17,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import PasswordInput from "@/components/formInputs/PasswordInput";
 import BasicInput from "@/components/formInputs/BasicInput";
-import {
-  onRegisterSubmit,
-  RegisterFormSchema,
-} from "./formLogics/registerLogic";
+import { RegisterFormSchema } from "./validation/registerVal";
+import { toast } from "sonner";
+import { useRegister } from "@/hooks/useAuth";
+import { QueryClient } from "@tanstack/react-query";
 
 export const RegisterForm = ({ className, ...props }: any) => {
   const form = useForm<z.infer<typeof RegisterFormSchema>>({
@@ -33,6 +33,34 @@ export const RegisterForm = ({ className, ...props }: any) => {
     },
   });
 
+  const queryClient = new QueryClient();
+  const { mutate: registerMutation, isPending } = useRegister();
+
+  function onSubmit(data: z.infer<typeof RegisterFormSchema>) {
+    registerMutation(
+      { newUser: data },
+      {
+        onSuccess: (res) => {
+          if (res) {
+            toast.success("Erfolgreich regestriert!", {
+              description: <pre>{JSON.stringify(res, null, 2)}</pre>,
+            });
+            queryClient.invalidateQueries();
+          } else {
+            toast.error("Regestrierung fehlgeschlagen", {
+              description: <pre>{JSON.stringify(res, null, 2)}</pre>,
+            });
+          }
+        },
+        onError: (err) => {
+          toast.error("Regestrierung fehlgeschlagen", {
+            description: <pre>{JSON.stringify(err, null, 2)}</pre>,
+          });
+        },
+      }
+    );
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -43,7 +71,7 @@ export const RegisterForm = ({ className, ...props }: any) => {
         <CardContent>
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(onRegisterSubmit)}
+              onSubmit={form.handleSubmit(onSubmit)}
               className="w-full space-y-6"
             >
               <div className="flex gap-4">

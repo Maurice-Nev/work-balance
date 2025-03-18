@@ -1,3 +1,4 @@
+import { LogoutButton } from "@/features/auth/components/logoutButton";
 import Image from "next/image";
 
 export default function Home() {

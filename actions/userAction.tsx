@@ -32,9 +32,13 @@ export async function createUserAction(newUser: NewUser) {
   const supabase = await createClient();
 
   try {
-    const { error } = await supabase.from("user").insert(newUser);
+    const { data, error } = await supabase
+      .from("user")
+      .insert(newUser)
+      .select("*, role:role_id(*)")
+      .single();
     if (error) throw error;
-    return { success: true };
+    return data as User;
   } catch (error) {
     throw error;
   }
