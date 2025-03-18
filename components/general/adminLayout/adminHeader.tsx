@@ -30,9 +30,9 @@ export const AdminHeader = () => {
   const currentPage = links.find((link) => link.url === pathname);
 
   return (
-    <header className="w-full h-16 relative border-b mb-4 flex justify-between items-center px-6">
+    <header className="w-full h-16 bg-sidebar relative border-b mb-4 flex justify-between items-center px-6">
       <div className="flex items-center md:gap-0 gap-4">
-        <SidebarTrigger variant={"outline"} className="w-10 h-10" />
+        <SidebarTrigger variant={"secondary"} className="w-10 h-10" />
         <Separator
           orientation="vertical"
           className="mx-4 md:block hidden data-[orientation=vertical]:h-6"
@@ -44,7 +44,7 @@ export const AdminHeader = () => {
       </div>
       <div className="flex gap-4 transition-all duration-300">
         <ModeToggle />
-        <LogoutButton variant={"outline"}>Logout</LogoutButton>
+        <LogoutButton variant={"secondary"}>Logout</LogoutButton>
       </div>
     </header>
   );

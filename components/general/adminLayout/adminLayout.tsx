@@ -21,7 +21,7 @@ export default function AdminLayout(
       <AdminSidebar />
       <main className="w-full">
         {/* <SidebarTrigger className="m-4 absolute top-0  w-10 h-10" /> */}
-        <Card className="m-4 pt-0 gap-0">
+        <Card className="m-4 pt-0 gap-0 overflow-hidden">
           <CardHeader className="px-0 relative">
             <AdminHeader /> {/* Header bleibt sticky */}
           </CardHeader>

@@ -30,8 +30,8 @@ export const LogoutButton = ({
     logoutMutation(undefined, {
       onSuccess: (res) => {
         if (res) {
-          toast.success("Logout erfolgreich!", {
-            description: <pre>{JSON.stringify(res, null, 2)}</pre>,
+          toast.success("Logout successfull!", {
+            description: <pre>{res.message}</pre>,
           });
 
           destroyCookie(null, "sessionToken");
@@ -41,7 +41,7 @@ export const LogoutButton = ({
         }
       },
       onError: (err) => {
-        toast.error("Logout fehlgeschlagen", {
+        toast.error("Logout error", {
           description: <pre>{JSON.stringify(err, null, 2)}</pre>,
         });
       },

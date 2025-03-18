@@ -46,18 +46,14 @@ export const LoginForm = ({ className, ...props }: any) => {
       {
         onSuccess: (res) => {
           if (res) {
-            toast.success("Erfolgreich eingeloggt!", {
-              description: <pre>{JSON.stringify(res, null, 2)}</pre>,
+            toast.success("Login successfull!", {
+              description: <pre>{res.message}</pre>,
             });
             queryClient.invalidateQueries();
-          } else {
-            toast.error("Login fehlgeschlagen", {
-              description: <pre>{JSON.stringify(res, null, 2)}</pre>,
-            });
           }
         },
         onError: (err) => {
-          toast.error("Login fehlgeschlagen", {
+          toast.error("Login error", {
             description: <pre>{JSON.stringify(err, null, 2)}</pre>,
           });
         },

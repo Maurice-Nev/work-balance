@@ -70,7 +70,7 @@ export async function register({ newUser }: { newUser: NewUser }) {
     if (sessionError) {
       throw sessionError;
     }
-    return { message: "Register succseeded" };
+    return { message: "You are now registered" };
   } catch (error) {
     throw error;
   }
@@ -117,7 +117,7 @@ export async function login({
         statusCode: 500,
       };
     }
-    return { message: "login succseeded" };
+    return { message: "You are now logged in" };
   } catch (error) {
     throw error;
   }

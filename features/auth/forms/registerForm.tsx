@@ -42,18 +42,14 @@ export const RegisterForm = ({ className, ...props }: any) => {
       {
         onSuccess: (res) => {
           if (res) {
-            toast.success("Erfolgreich regestriert!", {
-              description: <pre>{JSON.stringify(res, null, 2)}</pre>,
+            toast.success("Register successfull!", {
+              description: <pre>{res.message}</pre>,
             });
             queryClient.invalidateQueries();
-          } else {
-            toast.error("Regestrierung fehlgeschlagen", {
-              description: <pre>{JSON.stringify(res, null, 2)}</pre>,
-            });
           }
         },
         onError: (err) => {
-          toast.error("Regestrierung fehlgeschlagen", {
+          toast.error("Register error", {
             description: <pre>{JSON.stringify(err, null, 2)}</pre>,
           });
         },
