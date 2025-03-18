@@ -15,11 +15,11 @@ export const TranstackReactQueryProvider = ({
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      <ReactQueryDevtools
+      {/* <ReactQueryDevtools
         initialIsOpen={false}
-        position="right"
-        buttonPosition="bottom-right"
-      />
+        position="left"
+        buttonPosition="top-left"
+      /> */}
     </QueryClientProvider>
   );
 };

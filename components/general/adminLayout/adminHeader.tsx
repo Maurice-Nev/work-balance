@@ -30,7 +30,7 @@ export const AdminHeader = () => {
   const currentPage = links.find((link) => link.url === pathname);
 
   return (
-    <header className="w-full h-16 relative border-b mb-4 flex justify-between items-center md:px-4">
+    <header className="w-full h-16 relative border-b mb-4 flex justify-between items-center px-6">
       <div className="flex items-center md:gap-0 gap-4">
         <SidebarTrigger variant={"outline"} className="w-10 h-10" />
         <Separator
@@ -38,7 +38,9 @@ export const AdminHeader = () => {
           className="mx-4 md:block hidden data-[orientation=vertical]:h-6"
         />
         {/* Zeige den aktuellen Titel oder einen Fallback ("Dashboard") */}
-        <span className="text-lg">{currentPage?.title || "Dashboard"}</span>
+        <span className="text-lg pl-2">
+          {currentPage?.title || "Dashboard"}
+        </span>
       </div>
       <div className="flex gap-4 transition-all duration-300">
         <ModeToggle />
