@@ -338,7 +338,12 @@ export function DataTable({
 }: {
   data: z.infer<typeof DepartmentSchema>[];
 }) {
-  const [data, setData] = React.useState(() => initialData);
+  const [data, setData] = React.useState(initialData);
+
+  // Synchronisiere Daten, wenn sich initialData ändert (z. B. durch React Query)
+  React.useEffect(() => {
+    setData(initialData);
+  }, [initialData]);
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});

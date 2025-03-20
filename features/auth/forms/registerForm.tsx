@@ -45,7 +45,7 @@ export const RegisterForm = ({ className, ...props }: any) => {
             toast.success("Register successfull!", {
               description: <pre>{res.message}</pre>,
             });
-            queryClient.invalidateQueries();
+            // queryClient.invalidateQueries();
           }
         },
         onError: (err) => {

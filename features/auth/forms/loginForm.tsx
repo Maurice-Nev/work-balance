@@ -49,7 +49,7 @@ export const LoginForm = ({ className, ...props }: any) => {
             toast.success("Login successfull!", {
               description: <pre>{res.message}</pre>,
             });
-            queryClient.invalidateQueries();
+            // queryClient.invalidateQueries();
           }
         },
         onError: (err) => {

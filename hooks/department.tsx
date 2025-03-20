@@ -37,14 +37,15 @@ export const useGetDepartment = ({
 export const useGetAllDepartments = ({
   initialDepartments,
 }: DepartmentPageProps) => {
-  const queryKey = useMemo(() => "getAllDepartments", []);
+  // const queryKey = useMemo(() => "getAllDepartments", []);
   const query = useQuery({
     initialData: initialDepartments,
-    queryKey: [queryKey],
-    queryFn: useCallback(async () => {
+    queryKey: ["getAllDepartments"],
+    queryFn: async () => {
       const departments: Department[] = await getAllDepartmentsAction();
       return departments;
-    }, []),
+    },
+    staleTime: 1000 * 30,
   });
   return query;
 };
@@ -67,39 +68,40 @@ export const useCreateDepartment = () => {
 
 export const useUpdateDepartment = () => {
   const queryClient = useQueryClient();
-  const queryKey = useMemo(() => "getAllDepartments", []);
+  // const queryKey = useMemo(() => "getAllDepartments", []);
 
   const mutation = useMutation({
-    mutationFn: useCallback(
-      async ({
-        department_id,
-        updates,
-      }: {
-        department_id: string;
-        updates: UpdateDepartment;
-      }) => {
-        const test = await updateDepartmentAction(department_id, updates);
-        queryClient.invalidateQueries({
-          queryKey: [queryKey],
-        });
-        return test;
-      },
-      []
-    ),
+    mutationFn: async ({
+      department_id,
+      updates,
+    }: {
+      department_id: string;
+      updates: UpdateDepartment;
+    }) => {
+      return await updateDepartmentAction(department_id, updates);
+
+      // return test;
+    },
+    onSuccess: () => {
+      console.log("testo");
+      queryClient.invalidateQueries({
+        queryKey: ["getAllDepartments"],
+      });
+    },
   });
   return mutation;
 };
 
 export const useDeleteDepartment = () => {
   const queryClient = useQueryClient();
-  const queryKey = useMemo(() => "getAllDepartments", []);
+  // const queryKey = useMemo(() => "getAllDepartments", []);
 
   const mutation = useMutation({
     mutationFn: useCallback(async (department_id: string) => {
       return await deleteDepartmentAction(department_id);
     }, []),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] }); // Cache für alle Abteilungen löschen
+      queryClient.invalidateQueries({ queryKey: ["getAllDepartments"] }); // Cache für alle Abteilungen löschen
     },
   });
   return mutation;

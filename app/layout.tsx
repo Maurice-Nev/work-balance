@@ -2,10 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/general/themeProvider";
-import { TranstackReactQueryProvider } from "@/components/general/transtackReactQueryProvider";
-import { ModeToggle } from "@/components/general/modeToggle";
+import TranstackReactQueryProvider from "@/components/general/transtackReactQueryProvider";
 import { Toaster } from "@/components/ui/sonner";
-import { LogoutButton } from "@/features/auth/components/logoutButton";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,17 +28,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <TranstackReactQueryProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <Toaster />
-            {children}
-          </ThemeProvider>
-        </TranstackReactQueryProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Toaster />
+          <TranstackReactQueryProvider>{children}</TranstackReactQueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

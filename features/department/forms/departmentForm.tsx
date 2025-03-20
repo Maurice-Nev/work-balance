@@ -44,7 +44,7 @@ export const DepartmentForm = ({
                 toast.success("Update successfull!", {
                   description: <pre>{JSON.stringify(res, null, 2)}</pre>,
                 });
-                queryClient.invalidateQueries();
+                // queryClient.invalidateQueries();
               }
             },
             onError: (err) => {
@@ -62,7 +62,7 @@ export const DepartmentForm = ({
                 toast.success("Create successfull!", {
                   description: <pre>{JSON.stringify(res, null, 2)}</pre>,
                 });
-                queryClient.invalidateQueries();
+                // queryClient.invalidateQueries();
               }
             },
             onError: (err) => {

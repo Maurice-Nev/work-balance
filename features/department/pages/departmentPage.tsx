@@ -1,6 +1,6 @@
 "use client";
 import { DataTable } from "@/features/department/components/dataTable";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import data from "./data.json";
 import DepartmentForm from "../forms/departmentForm";
 import { DepartmentModal } from "../components/departmentModal";
@@ -24,9 +24,10 @@ export const DepartmentPage = ({ initialDepartments }: DepartmentPageProps) => {
   const { data: departments, isLoading } = useGetAllDepartments({
     initialDepartments,
   });
+
   return (
-    <div className="h-screen-minus-header my-8 items-center">
-      {/* {JSON.stringify(departments, null, 2)} */}
+    <div className="h-screen-minus-header pt-8 items-center">
+      {/* {departments && JSON.stringify(departments[0], null, 2)} */}
       {departments && departments?.length > 0 && (
         <DataTable
           data={
@@ -47,4 +48,5 @@ export const DepartmentPage = ({ initialDepartments }: DepartmentPageProps) => {
     </div>
   );
 };
-export default React.memo(DepartmentPage);
+
+export default DepartmentPage;
