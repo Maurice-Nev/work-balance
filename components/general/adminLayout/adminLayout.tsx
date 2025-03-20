@@ -1,16 +1,9 @@
 "use client";
 
-import { SidebarProvider, SidebarTrigger } from "../../ui/sidebar";
+import { SidebarProvider } from "../../ui/sidebar";
 import { AdminSidebar } from "./adminSidebar";
 import { AdminHeader } from "./adminHeader";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import ScrollToTopButton from "../scrollToTopButton";
 
 export default function AdminLayout(
@@ -20,7 +13,6 @@ export default function AdminLayout(
     <SidebarProvider>
       <AdminSidebar />
       <main className="w-full">
-        {/* <SidebarTrigger className="m-4 absolute top-0  w-10 h-10" /> */}
         <Card className="m-4 pt-0 gap-0 overflow-hidden">
           <CardHeader className="px-0 relative">
             <AdminHeader /> {/* Header bleibt sticky */}

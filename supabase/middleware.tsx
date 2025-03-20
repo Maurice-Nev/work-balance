@@ -35,10 +35,10 @@ export async function updateSession(request: NextRequest) {
   // Do not run code between createServerClient and supabase.auth.getUser()
   const user = await validateUserSession();
   const publicRoutes = [
-    "/",
-    "/about",
-    "/contact",
-    "/api/public",
+    // "/",
+    // "/about",
+    // "/contact",
+    // "/api/public",
     "/login",
     "/register",
   ];

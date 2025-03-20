@@ -30,8 +30,8 @@ let data = {
   },
   navMain: [
     {
-      title: "Apartments",
-      url: "/apartments",
+      title: "Departments",
+      url: "/departments",
       icon: ListIcon,
     },
     {

@@ -82,7 +82,7 @@ export const LoginForm = ({ className, ...props }: any) => {
                 control={form.control}
                 validationFieldName="password"
               />
-              <Button type="submit" className="w-full">
+              <Button type="submit" disabled={isPending} className="w-full">
                 Login
               </Button>
               <div className="text-center text-sm">

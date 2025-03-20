@@ -17,7 +17,7 @@ import {
 // Deine Links mit Titeln
 const links = [
   { title: "Dashboard", url: "/", icon: LayoutDashboardIcon },
-  { title: "Apartments", url: "/apartments", icon: ListIcon },
+  { title: "Departments", url: "/departments", icon: ListIcon },
   { title: "Analytics", url: "/analytics", icon: BarChartIcon },
   { title: "Comments", url: "/comments", icon: FolderIcon },
   { title: "Team", url: "/team", icon: UsersIcon },
