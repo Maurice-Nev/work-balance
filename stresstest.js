@@ -11,7 +11,7 @@ export let options = {
     { duration: '60s', target: 500 }, // Peak 1
     { duration: '60s', target: 600 }, // Mid-load
     { duration: '60s', target: 700 }, // Peak 2
-    { duration: '60s', target: 0 },    // Cooldown
+    { duration: '180s', target: 0 },    // Cooldown
   ],
 };
 

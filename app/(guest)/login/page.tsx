@@ -1,6 +1,9 @@
-"use server";
+// "use server";
 import LoginForm from "@/features/auth/forms/loginForm";
 import { GalleryVerticalEnd } from "lucide-react";
+
+export const dynamic = "force-static";
+export const revalidate = 86400;
 
 export default async function LoginPage() {
   return (

@@ -56,6 +56,10 @@ export async function updateSession(request: NextRequest) {
 
   const isPublicRoute = publicRoutes.includes(request.nextUrl.pathname);
 
+  if (user?.user?.role?.name) {
+    supabaseResponse.headers.set("X-User-Role", user.user.role.name);
+  }
+
   if (!user.authorized && !isPublicRoute) {
     // Kein Benutzer vorhanden und Route ist nicht public -> Umleitung zur Login-Seite
     const url = request.nextUrl.clone();
@@ -87,10 +91,6 @@ export async function updateSession(request: NextRequest) {
       url.pathname = "/";
       return NextResponse.redirect(url);
     }
-  }
-
-  if (user?.user?.role?.name) {
-    supabaseResponse.headers.set("X-User-Role", user.user.role.name);
   }
 
   return supabaseResponse;

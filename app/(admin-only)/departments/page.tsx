@@ -1,17 +1,19 @@
-"use server";
+// server only
+// "use server";
+
+// ✅ Next.js Static Settings
+export const dynamic = "force-static";
+export const revalidate = 30;
 
 import AdminLayout from "@/components/general/adminLayout/adminLayout";
-import { RoleEnum } from "@/supabase/types/database.models";
 import { headers } from "next/headers";
-import { UserDashboard } from "@/features/dashboard/components/userDashboard";
-import DepartmentPage from "@/features/department/pages/departmentPage";
 import { getAllDepartmentsAction } from "@/actions/departmentAction";
-import { validateUserSession } from "@/actions/authAction";
 import {
   dehydrate,
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
+import DepartmentPage from "@/features/department/pages/departmentPage";
 
 export default async function Page() {
   const headerList = await headers();
@@ -27,7 +29,6 @@ export default async function Page() {
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <AdminLayout>
-        {/* <UserDashboard /> */}
         <DepartmentPage />
       </AdminLayout>
     </HydrationBoundary>

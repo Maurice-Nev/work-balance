@@ -1,4 +1,4 @@
-"use server";
+// "use server";
 
 import AdminLayout from "@/components/general/adminLayout/adminLayout";
 import { headers } from "next/headers";
@@ -9,6 +9,9 @@ import {
   QueryClient,
 } from "@tanstack/react-query";
 import { getAllUsersAction } from "@/actions/userAction";
+
+export const dynamic = "force-static";
+export const revalidate = 30;
 
 export default async function Home() {
   const headerList = await headers();

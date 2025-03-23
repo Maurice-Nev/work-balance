@@ -1,9 +1,9 @@
-"use server";
+// "use server";
 
 import AdminLayout from "@/components/general/adminLayout/adminLayout";
-import { RoleEnum } from "@/supabase/types/database.models";
-import { headers } from "next/headers";
-import { UserDashboard } from "@/features/dashboard/components/userDashboard";
+// import { RoleEnum } from "@/supabase/types/database.models";
+// import { headers } from "next/headers";
+// import { UserDashboard } from "@/features/dashboard/components/userDashboard";
 import {
   dehydrate,
   HydrationBoundary,
@@ -11,12 +11,16 @@ import {
 } from "@tanstack/react-query";
 import { getAllRatingsAction } from "@/actions/ratingAction";
 import CommentPage from "@/features/comments/pages/commentPage";
+
+export const dynamic = "force-static";
+export const revalidate = 30;
+
 export default async function Home() {
-  const headerList = await headers();
+  // const headerList = await headers();
 
-  const userRole = headerList.get("X-User-Role") || "Guest";
+  // const userRole = headerList.get("X-User-Role") || "Guest";
 
-  const adminDashboardRoles = ["Admin", "Superadmin"];
+  // const adminDashboardRoles = ["Admin", "Superadmin"];
 
   const queryClient = new QueryClient();
 
@@ -25,15 +29,11 @@ export default async function Home() {
     queryFn: getAllRatingsAction,
   });
 
-  if (userRole && adminDashboardRoles.includes(userRole)) {
-    return (
-      <HydrationBoundary state={dehydrate(queryClient)}>
-        <AdminLayout>
-          <CommentPage />
-        </AdminLayout>
-      </HydrationBoundary>
-    );
-  } else {
-    return <>{userRole}</>;
-  }
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <AdminLayout>
+        <CommentPage />
+      </AdminLayout>
+    </HydrationBoundary>
+  );
 }

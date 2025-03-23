@@ -1,6 +1,9 @@
-"use server";
+// "use server";
 import RegisterForm from "@/features/auth/forms/registerForm";
 import { GalleryVerticalEnd } from "lucide-react";
+
+export const dynamic = "force-static";
+export const revalidate = 86400;
 
 export default async function RegisterPage() {
   return (
