@@ -34,12 +34,9 @@ export const useGetDepartment = ({
   return query;
 };
 
-export const useGetAllDepartments = ({
-  initialDepartments,
-}: DepartmentPageProps) => {
+export const useGetAllDepartments = () => {
   // const queryKey = useMemo(() => "getAllDepartments", []);
   const query = useQuery({
-    initialData: initialDepartments,
     queryKey: ["getAllDepartments"],
     queryFn: async () => {
       const departments: Department[] = await getAllDepartmentsAction();
@@ -56,7 +53,7 @@ export const useCreateDepartment = () => {
   const mutation = useMutation({
     mutationFn: async (newDepartment: NewDepartment) => {
       const test = await createDepartmentAction(newDepartment);
-      window.location.reload();
+      // window.location.reload();
       return test;
     },
     onSuccess: () => {
@@ -83,7 +80,7 @@ export const useUpdateDepartment = () => {
       // return test;
     },
     onSuccess: () => {
-      console.log("testo");
+      // console.log("testo");
       queryClient.invalidateQueries({
         queryKey: ["getAllDepartments"],
       });

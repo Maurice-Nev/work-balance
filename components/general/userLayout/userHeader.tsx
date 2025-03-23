@@ -13,19 +13,20 @@ import {
   ListIcon,
   UsersIcon,
 } from "lucide-react";
+import { getSelf } from "@/hooks/useAuth";
 
 // Deine Links mit Titeln
 const links = [
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboardIcon },
-  { title: "Departments", url: "/departments", icon: ListIcon },
-  { title: "Analytics", url: "/analytics", icon: BarChartIcon },
-  { title: "Comments", url: "/comments", icon: FolderIcon },
-  { title: "Team", url: "/team", icon: UsersIcon },
+  { title: "Welcome", url: "/", icon: LayoutDashboardIcon },
+  { title: "Comment", url: "/make-comments", icon: ListIcon },
+  // { title: "Analytics", url: "/analytics", icon: BarChartIcon },
+  // { title: "Comments", url: "/comments", icon: FolderIcon },
+  // { title: "Team", url: "/team", icon: UsersIcon },
 ];
 
-export const AdminHeader = () => {
+export const UserHeader = () => {
   const pathname = usePathname(); // ✅ Holt den aktuellen Pfad
-
+  const { data: user } = getSelf();
   // Finde den aktuellen Titel basierend auf der URL
   const currentPage = links.find((link) => link.url === pathname);
 
@@ -39,7 +40,11 @@ export const AdminHeader = () => {
         />
         {/* Zeige den aktuellen Titel oder einen Fallback ("Dashboard") */}
         <span className="text-lg pl-2">
-          {currentPage?.title || "Dashboard"}
+          {user?.user
+            ? currentPage?.title === "Welcome"
+              ? `Welcome ${user?.user?.name} ${user?.user?.surname}`
+              : currentPage?.title
+            : ""}
         </span>
       </div>
       <div className="flex gap-4 transition-all duration-300">

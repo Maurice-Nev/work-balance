@@ -6,24 +6,30 @@ import { headers } from "next/headers";
 import { UserDashboard } from "@/features/dashboard/components/userDashboard";
 import DepartmentPage from "@/features/department/pages/departmentPage";
 import { getAllDepartmentsAction } from "@/actions/departmentAction";
+import { validateUserSession } from "@/actions/authAction";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
 
 export default async function Page() {
   const headerList = await headers();
-
   const userRole = headerList.get("X-User-Role") || "Guest";
 
-  const adminDashboardRoles = ["Admin", "Superadmin"];
+  const queryClient = new QueryClient();
 
-  const departments = await getAllDepartmentsAction();
+  await queryClient.prefetchQuery({
+    queryKey: ["getAllDepartments"],
+    queryFn: getAllDepartmentsAction,
+  });
 
-  if (userRole && adminDashboardRoles.includes(userRole)) {
-    return (
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
       <AdminLayout>
         {/* <UserDashboard /> */}
-        <DepartmentPage initialDepartments={departments} />
+        <DepartmentPage />
       </AdminLayout>
-    );
-  } else {
-    return <>{userRole}</>;
-  }
+    </HydrationBoundary>
+  );
 }

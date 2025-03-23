@@ -3,6 +3,7 @@
 import {
   createUserAction,
   deleteUserAction,
+  getAllUsersAction,
   getUserAction,
   updateUserAction,
 } from "@/actions/userAction";
@@ -21,15 +22,27 @@ export const useGetUser = ({ user_id }: { user_id: string }) => {
   return query;
 };
 
+export const useGetAllUsers = () => {
+  const query = useQuery({
+    queryKey: ["getAllUsers"],
+    queryFn: async () => {
+      const user = await getAllUsersAction();
+      return user;
+    },
+    staleTime: 1000 * 30,
+  });
+  return query;
+};
+
 export const useCreateUser = () => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (newUser: NewUser) => {
+    mutationFn: async ({ newUser }: { newUser: NewUser }) => {
       return await createUserAction(newUser);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["getUser"] }); // Cache für User aktualisieren
+      queryClient.invalidateQueries({ queryKey: ["getAllUsers"] }); // Cache für User aktualisieren
     },
   });
   return mutation;
@@ -48,8 +61,8 @@ export const useUpdateUser = () => {
     }) => {
       return await updateUserAction(user_id, updates);
     },
-    onSuccess: (_, { user_id }) => {
-      queryClient.invalidateQueries({ queryKey: ["getUser", user_id] }); // Aktualisiert den User-Cache
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["getAllUsers"] }); // Aktualisiert den User-Cache
     },
   });
   return mutation;
@@ -63,7 +76,7 @@ export const useDeleteUser = () => {
       return await deleteUserAction(user_id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["getUser"] }); // Cache für alle User löschen
+      queryClient.invalidateQueries({ queryKey: ["getAllUsers"] }); // Cache für alle User löschen
     },
   });
   return mutation;

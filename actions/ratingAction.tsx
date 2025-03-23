@@ -29,9 +29,17 @@ export async function getAllRatingsAction() {
   const supabase = await createClient();
 
   try {
-    const { data, error } = await supabase.from("rating").select("*");
+    const { data, error } = await supabase.from("rating").select(`
+        *,
+        department (
+          name
+        )
+      `);
+
     if (error) throw error;
-    return data as Rating[];
+    return data as (Rating & {
+      department: { name: string | null };
+    })[];
   } catch (error) {
     throw error;
   }

@@ -30,25 +30,25 @@ let data = {
     avatar: "/avatars/shadcn.jpg",
   },
   navMain: [
-    {
-      title: "Departments",
-      url: "/departments",
-      icon: ListIcon,
-    },
+    // {
+    //   title: "Departments",
+    //   url: "/departments",
+    //   icon: ListIcon,
+    // },
     {
       title: "Comments",
-      url: "/comments",
+      url: "/make-comments",
       icon: FolderIcon,
     },
-    {
-      title: "Team",
-      url: "/team",
-      icon: UsersIcon,
-    },
+    // {
+    //   title: "Team",
+    //   url: "/team",
+    //   icon: UsersIcon,
+    // },
   ],
 };
 
-export function AdminSidebar({
+export function UserSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const { data: userData } = getSelf();

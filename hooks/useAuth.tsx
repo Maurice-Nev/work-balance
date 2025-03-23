@@ -63,8 +63,6 @@ export const getSelf = () => {
       const res = await validateUserSession();
       return res;
     },
-    // staleTime: 0,
-    // cacheTime: 1000 * 60 * 5, // 5 Minuten
     staleTime: 1000 * 30, // 30 Sekunden
   });
   return query;

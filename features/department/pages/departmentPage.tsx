@@ -20,10 +20,8 @@ export interface DepartmentPageProps {
   }>;
 }
 
-export const DepartmentPage = ({ initialDepartments }: DepartmentPageProps) => {
-  const { data: departments, isLoading } = useGetAllDepartments({
-    initialDepartments,
-  });
+export const DepartmentPage = () => {
+  const { data: departments, isLoading } = useGetAllDepartments();
 
   return (
     <div className="h-screen-minus-header pt-8 items-center">

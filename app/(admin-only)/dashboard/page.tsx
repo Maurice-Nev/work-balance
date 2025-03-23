@@ -1,10 +1,10 @@
 "use server";
 
-import AdminLayout from "@/components/general/adminLayout/adminLayout";
-import { RoleEnum } from "@/supabase/types/database.models";
 import { headers } from "next/headers";
 import { UserDashboard } from "@/features/dashboard/components/userDashboard";
 import { AdminDashboard } from "@/features/dashboard/pages/adminDashboard";
+import UserLayout from "@/components/general/userLayout/userLayout";
+import AdminLayout from "@/components/general/adminLayout/adminLayout";
 export default async function Home() {
   const headerList = await headers();
 
@@ -12,13 +12,9 @@ export default async function Home() {
 
   const adminDashboardRoles = ["Admin", "Superadmin"];
 
-  if (userRole && adminDashboardRoles.includes(userRole)) {
-    return (
-      <AdminLayout>
-        <AdminDashboard />
-      </AdminLayout>
-    );
-  } else {
-    return <>{userRole}</>;
-  }
+  return (
+    <AdminLayout>
+      <AdminDashboard />
+    </AdminLayout>
+  );
 }

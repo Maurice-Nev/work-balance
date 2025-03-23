@@ -1,21 +1,21 @@
 "use client";
 
 import { SidebarProvider } from "../../ui/sidebar";
-import { AdminSidebar } from "./adminSidebar";
-import { AdminHeader } from "./adminHeader";
+import { UserSidebar } from "./userSidebar";
+import { UserHeader } from "./userHeader";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import ScrollToTopButton from "../scrollToTopButton";
 
-export default function AdminLayout({
+export default function UserLayout({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <SidebarProvider>
-      <AdminSidebar />
+      <UserSidebar />
       <main className="w-full">
         <Card className="m-4 pt-0 gap-0 overflow-hidden">
           <CardHeader className="px-0 relative">
-            <AdminHeader /> {/* Header bleibt sticky */}
+            <UserHeader /> {/* Header bleibt sticky */}
           </CardHeader>
           <CardContent className="h-screen-minus-header w-full overflow-auto">
             {props.children}

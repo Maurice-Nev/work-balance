@@ -39,11 +39,20 @@ export async function updateSession(request: NextRequest) {
     // "/about",
     // "/contact",
     // "/api/public",
+
     "/login",
     "/register",
   ];
 
-  const protectedAuthRoutes = ["/login", "/register"];
+  const restrictedUserRoutes = [
+    // "/",
+    "/dashboard",
+    "/team",
+    "/comments",
+    "/departments",
+  ];
+
+  const protectedAuthRoutes = ["/login", "/register", "/"];
 
   const isPublicRoute = publicRoutes.includes(request.nextUrl.pathname);
 
@@ -57,11 +66,27 @@ export async function updateSession(request: NextRequest) {
   const isProtectedAuthRoute = protectedAuthRoutes.includes(
     request.nextUrl.pathname
   );
+  const isRestrictedUserRoutes = restrictedUserRoutes.includes(
+    request.nextUrl.pathname
+  );
 
   if (user.authorized && isProtectedAuthRoute) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/";
-    return NextResponse.redirect(url);
+    if (
+      (user?.user?.role?.name && user.user.role.name === "Superadmin") ||
+      (user?.user?.role?.name && user.user.role.name === "Admin")
+    ) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/dashboard";
+      return NextResponse.redirect(url);
+    }
+  }
+
+  if (user.authorized && isRestrictedUserRoutes) {
+    if (user?.user?.role?.name && user.user.role.name === "User") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/";
+      return NextResponse.redirect(url);
+    }
   }
 
   if (user?.user?.role?.name) {

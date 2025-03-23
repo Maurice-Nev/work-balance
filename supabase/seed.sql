@@ -17,6 +17,19 @@ VALUES (
 )
 ON CONFLICT (email) DO NOTHING;
 
+INSERT INTO "user" (id, email, password, name, surname, role_id, created_at)
+SELECT 
+    gen_random_uuid(), 
+    'user' || i || '@example.com', 
+    crypt('liwasabo', gen_salt('bf', 10)), 
+    INITCAP(MD5(random()::text)), 
+    INITCAP(MD5(random()::text)), 
+    (SELECT id FROM role WHERE name = 'User' LIMIT 1), 
+    NOW()
+FROM generate_series(1, 100) AS i
+ON CONFLICT (email) DO NOTHING;
+
+
 -- Erstelle 10 Departments mit zufälligen Namen
 INSERT INTO public.department (id, name, created_at)
 SELECT

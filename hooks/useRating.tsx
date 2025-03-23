@@ -30,7 +30,7 @@ export const useGetAllRatings = () => {
   return useQuery({
     queryKey: ["getAllRatings"],
     queryFn: async () => {
-      const ratings: Rating[] = await getAllRatingsAction();
+      const ratings = await getAllRatingsAction();
       return ratings;
     },
   });
