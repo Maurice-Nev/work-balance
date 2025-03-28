@@ -70,10 +70,10 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ChartContainer } from "@/components/ui/chart";
-import DepartmentForm from "@/features/department/forms/departmentForm";
+import DepartmentForm from "@/features/(admin-only)/department/forms/departmentForm";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { User } from "@/supabase/types/database.models";
-import { DepartmentModal } from "@/features/department/components/departmentModal";
+import { DepartmentModal } from "@/features/(admin-only)/department/components/departmentModal";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -82,25 +82,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { RegisterModal } from "./registerModal";
-import RegisterForm from "../forms/registerForm";
+import { cn } from "@/lib/utils";
 
 // 🔹 User Schema für Type-Safety mit Zod
 export const UserSchema = z.object({
   id: z.string(),
-  name: z.string().nullable(), // ✅ Erlaubt NULL-Werte
-  surname: z.string().nullable(),
-  email: z.string().nullable(),
-  role_id: z.string().nullable(),
-  password: z.string().nullable(),
+  comment: z.string().nullable(),
   created_at: z.string(),
-  role: z
+  department_id: z.string().nullable(),
+  rating: z.number().nullable(),
+  department: z
     .object({
-      id: z.string(),
       name: z.string().nullable(),
-      created_at: z.string(),
     })
-    .nullable(), // ✅ Falls `role` null sein kann
+    .nullable(),
 });
 // 🔹 Drag Handle Komponente
 function DragHandle({ id }: { id: UniqueIdentifier }) {
@@ -126,21 +121,31 @@ const columns: ColumnDef<z.infer<typeof UserSchema>>[] = [
     cell: ({ row }) => <DragHandle id={row.original.id} />,
   },
   {
-    accessorKey: "name",
-    header: "Name",
-    cell: ({ row }) => <TableCellViewer item={row.original} />,
+    accessorKey: "department.name",
+    header: "Department",
+    cell: ({ row }) => row.original.department?.name,
   },
   {
-    accessorKey: "email",
-    header: "E-Mail",
-    cell: ({ row }) => row.original.email,
+    accessorKey: "comment",
+    header: "Comment",
+    cell: ({ row }) => row.original.comment,
   },
   {
-    accessorKey: "role.name",
-    header: "Role",
+    accessorKey: "rating",
+    header: "Rating",
     cell: ({ row }) => (
-      <Badge variant="outline" className="px-2 py-1">
-        {row?.original?.role?.name}
+      <Badge
+        variant="outline"
+        className={cn(
+          "px-2 py-1",
+          row.original.rating && row?.original?.rating < 3
+            ? "text-destructive"
+            : row.original.rating && row.original.rating < 4
+            ? "text-yellow-500"
+            : "text-green-500"
+        )}
+      >
+        {row?.original.rating}
       </Badge>
     ),
   },
@@ -191,7 +196,7 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof UserSchema>> }) {
 }
 
 // 🔹 Hauptkomponente für die User DataTable
-export function UserTable({
+export function CommentTable({
   data: initialData,
 }: {
   data: z.infer<typeof UserSchema>[];
@@ -284,7 +289,7 @@ export function UserTable({
                   <PlusIcon />
                   <span className="hidden lg:inline">Add Department</span>
                 </Button> */}
-          <RegisterModal />
+          {/* <RegisterModal /> */}
         </div>
       </div>
       <div className="overflow-hidden rounded-lg border">
@@ -411,143 +416,5 @@ export function UserTable({
         </div>
       </div>
     </div>
-  );
-}
-
-function TableCellViewer({ item }: { item: z.infer<typeof UserSchema> }) {
-  const isMobile = useIsMobile();
-
-  // const chartData = prepareChartData(item);
-  // const { ratingTrend, commentTrend } = analyzeTrends(item);
-
-  // 🔹 Berechnung der "All Time" Werte
-  // const allTimeTotalRatings = item.rating.length;
-  // const allTimeAvgRating =
-  //   allTimeTotalRatings > 0
-  //     ? item.rating.reduce((sum, r) => sum + (r.rating ?? 0), 0) /
-  //       allTimeTotalRatings
-  //     : 0;
-  // const allTimeCommentCount = item.rating.filter((r) => r.comment).length;
-
-  // // 🔹 Berechnung der "Last 8 Weeks" Werte
-  // const last8WeeksData = chartData.slice(-8); // Nur die letzten 8 Wochen nehmen
-  // const last8WeeksTotal = last8WeeksData.length;
-  // const last8WeeksAvgRating =
-  //   last8WeeksTotal > 0
-  //     ? last8WeeksData.reduce((sum, week) => sum + week.avgRating, 0) /
-  //       last8WeeksTotal
-  //     : 0;
-  // const last8WeeksAvgComments =
-  //   last8WeeksTotal > 0
-  //     ? last8WeeksData.reduce((sum, week) => sum + week.commentCount, 0) /
-  //       last8WeeksTotal
-  //     : 0;
-
-  return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="link" className="w-fit px-0 text-left text-foreground">
-          {item.name} {item.surname}
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="right" className="flex flex-col">
-        <SheetHeader className="gap-1">
-          <SheetTitle>
-            {item.name} {item.surname}
-          </SheetTitle>
-          {/* <SheetDescription>Aktivity (Last 8 weeks)</SheetDescription> */}
-        </SheetHeader>
-        <div className="flex flex-1 flex-col gap-4 overflow-y-auto py-4 text-sm">
-          <pre>{JSON.stringify(item, null, 2)}</pre>
-          {/* {!isMobile && (
-            <>
-              <ChartContainer config={chartConfig}>
-                <AreaChart data={chartData} margin={{ left: 0, right: 10 }}>
-                  <CartesianGrid vertical={false} />
-                  <XAxis dataKey="week" />
-                  <YAxis />
-                  <ChartTooltip
-                    content={<ChartTooltipContent indicator="dot" />}
-                  />
-                  <Area
-                    dataKey="avgRating"
-                    stroke="hsl(var(--cart-1))"
-                    fillOpacity={0.3}
-                    fill="hsl(var(--chart-1))"
-                  />
-                  <Area
-                    dataKey="commentCount"
-                    stroke="hsl(var(--chart-2))"
-                    fillOpacity={0.3}
-                    fill="hsl(var(--chart-2))"
-                  />
-                </AreaChart>
-              </ChartContainer>
-              <Separator />
-
-              <div className="grid gap-2 p-4">
-                <div
-                  className={`flex gap-2 font-medium leading-none ${
-                    ratingTrend > 0 ? "text-green-500" : "text-red-500"
-                  }`}
-                >
-                  Rating Trend: {ratingTrend > 0 ? "Up" : "Down"} by{" "}
-                  {Math.abs(ratingTrend).toFixed(1)}
-                  {ratingTrend > 0 ? (
-                    <TrendingUpIcon className="size-4" />
-                  ) : (
-                    <TrendingDownIcon className="size-4" />
-                  )}
-                </div>
-                <div
-                  className={`flex gap-2 font-medium leading-none ${
-                    commentTrend > 0 ? "text-green-500" : "text-red-500"
-                  }`}
-                >
-                  Comment Trend: {commentTrend > 0 ? "Up" : "Down"} by{" "}
-                  {Math.abs(commentTrend)}
-                  {commentTrend > 0 ? (
-                    <TrendingUpIcon className="size-4" />
-                  ) : (
-                    <TrendingDownIcon className="size-4" />
-                  )}
-                </div>
-                <div className="text-muted-foreground">
-                  Weekly analysis of rating trends and comments.
-                </div>
-              </div>
-              <Separator />
-
-              <div className="grid gap-2 p-4">
-                <div className="text-lg font-semibold">All Time Stats</div>
-                <div className="flex gap-2 text-sm">
-                  <span className="font-medium">Avg Rating:</span>{" "}
-                  {allTimeAvgRating.toFixed(2)}
-                </div>
-                <div className="flex gap-2 text-sm">
-                  <span className="font-medium">Total Comments:</span>{" "}
-                  {allTimeCommentCount}
-                </div>
-
-                <div className="text-lg font-semibold mt-2">Last 8 Weeks</div>
-                <div className="flex gap-2 text-sm">
-                  <span className="font-medium">Avg Rating:</span>{" "}
-                  {last8WeeksAvgRating.toFixed(2)}
-                </div>
-                <div className="flex gap-2 text-sm">
-                  <span className="font-medium">Avg Comments per Week:</span>{" "}
-                  {last8WeeksAvgComments.toFixed(2)}
-                </div>
-              </div>
-              <Separator />
-            </>
-          )} */}
-        </div>
-        <SheetFooter>
-          {/* <DepartmentForm initialValues={item} /> */}
-          <RegisterForm initialValues={item} />
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
   );
 }

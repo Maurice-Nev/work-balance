@@ -14,6 +14,7 @@ import {
   Rating,
   UpdateRating,
 } from "@/supabase/types/database.models";
+import { toast } from "sonner";
 
 export const useGetRating = ({ rating_id }: { rating_id: string }) => {
   return useQuery({
@@ -57,11 +58,27 @@ export const useCreateRating = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (newRating: NewRating) => {
+    mutationFn: async ({ newRating }: { newRating: NewRating }) => {
       return await createRatingAction(newRating);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["getAllRatings"] }); // Aktualisiert den Cache
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({
+        queryKey: ["getAllDepartments"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["getAllRatings"],
+      });
+
+      if (res) {
+        toast.success("Created successfull!", {});
+      }
+    },
+
+    onError: (err) => {
+      toast.error("Create error", {
+        description: <pre>{JSON.stringify(err, null, 2)}</pre>,
+      });
     },
   });
 };
@@ -79,8 +96,23 @@ export const useUpdateRating = () => {
     }) => {
       return await updateRatingAction(rating_id, updates);
     },
-    onSuccess: (_, { rating_id }) => {
-      queryClient.invalidateQueries({ queryKey: ["getRating", rating_id] }); // Aktualisiert nur diese Bewertung
+
+    onSuccess: (res, { rating_id }) => {
+      if (res) {
+        toast.success("Update successfull!");
+        queryClient.invalidateQueries({
+          queryKey: ["getRating", rating_id],
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: ["getAllRatings"],
+        });
+      }
+    },
+    onError: (err) => {
+      toast.error("Update error", {
+        description: <pre>{JSON.stringify(err, null, 2)}</pre>,
+      });
     },
   });
 };

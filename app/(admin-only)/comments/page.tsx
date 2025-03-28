@@ -10,7 +10,7 @@ import {
   QueryClient,
 } from "@tanstack/react-query";
 import { getAllRatingsAction } from "@/actions/ratingAction";
-import CommentPage from "@/features/comments/pages/commentPage";
+import CommentPage from "@/features/(admin-only)/comments/pages/commentPage";
 
 export const dynamic = "force-static";
 export const revalidate = 30;

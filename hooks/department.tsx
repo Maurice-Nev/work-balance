@@ -13,8 +13,9 @@ import {
   NewDepartment,
   UpdateDepartment,
 } from "@/supabase/types/database.models";
-import { DepartmentPageProps } from "@/features/department/pages/departmentPage";
+import { DepartmentPageProps } from "@/features/(admin-only)/department/pages/departmentPage";
 import { useCallback, useMemo } from "react";
+import { toast } from "sonner";
 
 export const useGetDepartment = ({
   department_id,
@@ -35,13 +36,13 @@ export const useGetDepartment = ({
 };
 
 export const useGetAllDepartments = () => {
-  // const queryKey = useMemo(() => "getAllDepartments", []);
+  const queryKey = useMemo(() => "getAllDepartments", []);
+
   const query = useQuery({
-    queryKey: ["getAllDepartments"],
-    queryFn: async () => {
-      const departments: Department[] = await getAllDepartmentsAction();
-      return departments;
-    },
+    queryKey: [queryKey],
+    queryFn: useCallback(async () => {
+      return await getAllDepartmentsAction();
+    }, []),
     staleTime: 1000 * 30,
   });
   return query;
@@ -50,17 +51,23 @@ export const useGetAllDepartments = () => {
 export const useCreateDepartment = () => {
   const queryClient = useQueryClient();
 
-  const mutation = useMutation({
+  return useMutation({
     mutationFn: async (newDepartment: NewDepartment) => {
-      const test = await createDepartmentAction(newDepartment);
-      // window.location.reload();
-      return test;
+      const res = await createDepartmentAction(newDepartment);
+      return res;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["getAllDepartments"] }); // Aktualisiert den Cache
+    onSuccess: (res) => {
+      if (res) {
+        toast.success("Create successfull!", {});
+        queryClient.invalidateQueries({ queryKey: ["getAllDepartments"] });
+      }
+    },
+    onError: (err) => {
+      toast.error("Create error", {
+        description: <pre>{JSON.stringify(err, null, 2)}</pre>,
+      });
     },
   });
-  return mutation;
 };
 
 export const useUpdateDepartment = () => {
@@ -76,13 +83,20 @@ export const useUpdateDepartment = () => {
       updates: UpdateDepartment;
     }) => {
       return await updateDepartmentAction(department_id, updates);
-
-      // return test;
     },
-    onSuccess: () => {
-      // console.log("testo");
-      queryClient.invalidateQueries({
-        queryKey: ["getAllDepartments"],
+    onSuccess: (res) => {
+      if (res) {
+        toast.success("Update successfull!", {
+          // description: <pre>{JSON.stringify(res, null, 2)}</pre>,
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["getAllDepartments"],
+        });
+      }
+    },
+    onError: (err) => {
+      toast.error("Update error", {
+        description: <pre>{JSON.stringify(err, null, 2)}</pre>,
       });
     },
   });

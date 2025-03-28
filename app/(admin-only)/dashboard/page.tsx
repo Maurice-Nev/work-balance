@@ -1,8 +1,8 @@
 // "use server";
 
 import { headers } from "next/headers";
-import { UserDashboard } from "@/features/dashboard/components/userDashboard";
-import { AdminDashboard } from "@/features/dashboard/pages/adminDashboard";
+import { UserDashboard } from "@/features/(admin-only)/dashboard/components/userDashboard";
+import { AdminDashboard } from "@/features/(admin-only)/dashboard/pages/adminDashboard";
 import UserLayout from "@/components/general/userLayout/userLayout";
 import AdminLayout from "@/components/general/adminLayout/adminLayout";
 

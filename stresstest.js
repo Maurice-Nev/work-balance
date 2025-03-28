@@ -3,16 +3,20 @@ import { sleep } from 'k6';
 
 export let options = {
   stages: [
-    { duration: '60s', target: 50 },   // Warm-up
-    { duration: '60s', target: 100 }, // Mid-load
-    { duration: '60s', target: 200 }, // Mid-load
-    { duration: '60s', target: 300 }, // Mid-load
-    { duration: '60s', target: 400 }, // Mid-load
-    { duration: '60s', target: 500 }, // Peak 1
-    { duration: '60s', target: 600 }, // Mid-load
-    { duration: '60s', target: 700 }, // Peak 2
-    { duration: '180s', target: 0 },    // Cooldown
+    { duration: '60s', target: 50 },   
+    { duration: '60s', target: 100 }, 
+    { duration: '60s', target: 200 }, 
+    { duration: '60s', target: 300 }, 
+    { duration: '60s', target: 400 }, 
+    { duration: '60s', target: 500 }, 
+    { duration: '60s', target: 600 }, 
+    { duration: '60s', target: 700 }, 
+    { duration: '60s', target: 800 }, 
+    { duration: '60s', target: 900 }, 
+    { duration: '60s', target: 1000 }, 
+    
   ],
+  gracefulRampDown: '320s'
 };
 
 export default function () {

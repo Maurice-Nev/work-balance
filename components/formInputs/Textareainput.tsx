@@ -9,26 +9,26 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Control } from "react-hook-form";
+import { Textarea } from "../ui/textarea";
 
-interface EmailInputProps {
+interface TextareaInputProps {
   control: Control<any> | undefined;
   validationFieldName: string;
-  label?: string;
-  placeholder?: string;
+  label: string;
+  placeholder: string;
   description?: string;
   className?: string;
 }
 
-export const EmailInput = ({
+export const TextareaInput = ({
   control,
   validationFieldName,
-  label = "Email",
-  placeholder = "m.musterman@hot-mail.com",
+  label,
+  placeholder,
   description,
   className,
-}: EmailInputProps) => {
+}: TextareaInputProps) => {
   return (
     <FormField
       control={control}
@@ -37,14 +37,16 @@ export const EmailInput = ({
         <FormItem>
           <FormLabel>{label}</FormLabel>
           <FormControl>
-            <Input
-              type="email"
+            <Textarea
               className={className}
               placeholder={placeholder}
               {...field}
+              rows={10}
             />
           </FormControl>
+
           {description && <FormDescription>{description}</FormDescription>}
+
           <FormMessage />
         </FormItem>
       )}
@@ -52,4 +54,4 @@ export const EmailInput = ({
   );
 };
 
-export default EmailInput;
+export default TextareaInput;

@@ -13,7 +13,7 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
-import DepartmentPage from "@/features/department/pages/departmentPage";
+import DepartmentPage from "@/features/(admin-only)/department/pages/departmentPage";
 
 export default async function Page() {
   const headerList = await headers();

@@ -12,23 +12,23 @@ import {
 import { Input } from "@/components/ui/input";
 import { Control } from "react-hook-form";
 
-interface EmailInputProps {
+interface NumberInputProps {
   control: Control<any> | undefined;
   validationFieldName: string;
-  label?: string;
-  placeholder?: string;
+  label: string;
+  placeholder: string;
   description?: string;
   className?: string;
 }
 
-export const EmailInput = ({
+export const NumberInput = ({
   control,
   validationFieldName,
-  label = "Email",
-  placeholder = "m.musterman@hot-mail.com",
+  label,
+  placeholder,
   description,
   className,
-}: EmailInputProps) => {
+}: NumberInputProps) => {
   return (
     <FormField
       control={control}
@@ -38,13 +38,15 @@ export const EmailInput = ({
           <FormLabel>{label}</FormLabel>
           <FormControl>
             <Input
-              type="email"
+              type="number"
               className={className}
               placeholder={placeholder}
               {...field}
             />
           </FormControl>
+
           {description && <FormDescription>{description}</FormDescription>}
+
           <FormMessage />
         </FormItem>
       )}
@@ -52,4 +54,4 @@ export const EmailInput = ({
   );
 };
 
-export default EmailInput;
+export default NumberInput;

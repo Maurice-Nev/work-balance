@@ -1,5 +1,5 @@
 "use client";
-import { DataTable } from "@/features/department/components/dataTable";
+import { DataTable } from "@/features/(admin-only)/department/components/dataTable";
 import React, { useEffect, useState } from "react";
 import data from "./data.json";
 import DepartmentForm from "../forms/departmentForm";

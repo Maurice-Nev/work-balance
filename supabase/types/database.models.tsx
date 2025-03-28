@@ -26,3 +26,7 @@ export enum RoleEnum {
   "Admin",
   "Superadmin",
 }
+
+export type DepartmentWithRatings = Department & {
+  rating: Rating[]; // Department enthält jetzt ein Array von Ratings
+};

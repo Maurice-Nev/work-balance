@@ -89,6 +89,7 @@ export function UserSidebar({
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
+        {/* <pre>{JSON.stringify(userData?.user, null, 2)}</pre> */}
         <NavUser user={data.user} />
       </SidebarFooter>
     </Sidebar>

@@ -37,8 +37,8 @@ export async function getAllDepartmentsAction() {
     const { data, error } = await supabase
       .from("department")
       .select("*, rating(id, rating, comment, created_at)")
-      .order("created_at", { ascending: false }) // Departments nach Erstellungsdatum sortieren
-      .order("created_at", { foreignTable: "rating", ascending: false }); // Ratings nach Datum sortieren
+      .order("created_at", { ascending: false }); // Departments nach Erstellungsdatum sortieren
+    // .order("created_at", { foreignTable: "rating", ascending: false }); // Ratings nach Datum sortieren
 
     if (error) throw error;
 

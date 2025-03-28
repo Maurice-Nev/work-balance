@@ -1,18 +1,15 @@
 // "use server";
 
 import UserLayout from "@/components/general/userLayout/userLayout";
-import AdminLayout from "@/components/general/userLayout/userLayout";
-import { headers } from "next/headers";
+import { DashboardPage } from "@/features/(user-only)/dashboard/pages/dashboard";
 
 export const dynamic = "force-static";
 export const revalidate = 30;
 
 export default async function Home() {
-  const headerList = await headers();
-
-  const userRole = headerList.get("X-User-Role") || "Guest";
-
-  const adminDashboardRoles = ["Admin", "Superadmin"];
-
-  return <UserLayout>{userRole} tets</UserLayout>;
+  return (
+    <UserLayout>
+      <DashboardPage />
+    </UserLayout>
+  );
 }

@@ -2,7 +2,7 @@
 
 import AdminLayout from "@/components/general/adminLayout/adminLayout";
 import { headers } from "next/headers";
-import TeamPage from "@/features/team/pages/teamPage";
+import TeamPage from "@/features/(admin-only)/team/pages/teamPage";
 import {
   dehydrate,
   HydrationBoundary,

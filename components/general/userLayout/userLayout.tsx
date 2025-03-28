@@ -13,7 +13,7 @@ export default function UserLayout({
     <SidebarProvider>
       <UserSidebar />
       <main className="w-full">
-        <Card className="m-4 pt-0 gap-0 overflow-hidden">
+        <Card className="mx-4 mt-4 pt-0 gap-0 overflow-hidden">
           <CardHeader className="px-0 relative">
             <UserHeader /> {/* Header bleibt sticky */}
           </CardHeader>

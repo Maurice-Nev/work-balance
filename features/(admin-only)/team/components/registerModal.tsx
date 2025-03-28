@@ -13,20 +13,17 @@ import RegisterForm from "../forms/registerForm";
 import { PlusIcon } from "lucide-react";
 import { NewDepartment } from "@/supabase/types/database.models";
 
-interface DepartmentModalProps extends React.HTMLAttributes<HTMLDivElement> {
+interface RegisterModalProps extends React.HTMLAttributes<HTMLDivElement> {
   initialValues?: NewDepartment;
 }
 
-export function RegisterModal({
-  children,
-  initialValues,
-}: DepartmentModalProps) {
-  const [openDialog, setOpenDdialog] = React.useState(false);
+export function RegisterModal({ children, initialValues }: RegisterModalProps) {
+  const [open, onOpenChange] = React.useState(false);
 
   return (
     <div>
       <div className="">
-        <Dialog open={openDialog} onOpenChange={setOpenDdialog}>
+        <Dialog open={open} onOpenChange={onOpenChange}>
           <DialogTrigger asChild>
             {children ? (
               children
