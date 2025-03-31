@@ -66,30 +66,20 @@ export async function getAllDepartmentsAction() {
 //   throw error;
 // }
 
-export async function getAllDepartmentsWithRatings() {
+export async function getAllDepartmentsWithoutRatings() {
   const supabase = await createClient();
 
   try {
     // Alle Departments mit den dazugehörigen Ratings abrufen
     const { data, error } = await supabase
       .from("department")
-      .select("*, rating(id, rating, comment, created_at)");
+      .select("id, name");
 
     if (error) throw error;
 
-    return data as Array<{
-      id: string;
-      name: string | null;
-      created_at: string;
-      rating: Array<{
-        id: string;
-        rating: number | null;
-        comment: string | null;
-        created_at: string;
-      }>;
-    }>;
+    return data;
   } catch (error) {
-    console.error("Fehler beim Abrufen der Departments mit Ratings:", error);
+    console.error("Fehler beim Abrufen der Departments:", error);
     throw error;
   }
 }

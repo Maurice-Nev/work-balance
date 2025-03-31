@@ -21,6 +21,7 @@ import { RegisterFormSchema } from "./validation/registerVal";
 import { toast } from "sonner";
 import { useRegister } from "@/hooks/useAuth";
 import { QueryClient } from "@tanstack/react-query";
+import Logo from "@/components/general/logo";
 
 export const RegisterForm = ({ className, ...props }: any) => {
   const form = useForm<z.infer<typeof RegisterFormSchema>>({
@@ -63,6 +64,9 @@ export const RegisterForm = ({ className, ...props }: any) => {
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome</CardTitle>
           <CardDescription>Register with your Credentials</CardDescription>
+          <div className=" flex size-6 items-center justify-center w-full rounded-md bg-foreground py-6 mt-6">
+            <Logo className="text-background" />
+          </div>
         </CardHeader>
         <CardContent>
           <Form {...form}>

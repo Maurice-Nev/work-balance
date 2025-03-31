@@ -21,6 +21,7 @@ import bcrypt from "bcryptjs";
 import { useLogin } from "@/hooks/useAuth";
 import { LoginFormSchema } from "./validation/loginVal";
 import { QueryClient } from "@tanstack/react-query";
+import Logo from "@/components/general/logo";
 
 export const LoginForm = ({ className, ...props }: any) => {
   const form = useForm<z.infer<typeof LoginFormSchema>>({
@@ -67,6 +68,9 @@ export const LoginForm = ({ className, ...props }: any) => {
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back</CardTitle>
           <CardDescription>Login with your Email and Password</CardDescription>
+          <div className=" flex size-6 items-center justify-center w-full rounded-md bg-foreground py-6 mt-6">
+            <Logo className="text-background" />
+          </div>
         </CardHeader>
         <CardContent>
           <Form {...form}>

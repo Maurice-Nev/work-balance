@@ -6,6 +6,7 @@ import {
   NewStress,
   UpdateStress,
 } from "../supabase/types/database.models";
+import { getUserByToken } from "./authAction";
 
 export async function getStressAction({ stress_id }: { stress_id: string }) {
   const supabase = await createClient();
@@ -54,6 +55,50 @@ export async function getStressForUserAction({ user_id }: { user_id: string }) {
   }
 }
 
+export async function getTodayStressForUserAction() {
+  const supabase = await createClient();
+
+  try {
+    const user = await getUserByToken();
+
+    if (!user) {
+      throw {
+        name: "stress",
+        message: "User not loggeed in",
+        statusCode: 500,
+      };
+    }
+    // Heutiges Datum berechnen
+    const today = new Date().toISOString().split("T")[0];
+
+    const { data, error } = await supabase
+      .from("stress")
+      .select()
+      .eq("user_id", user.id)
+      .gte("created_at", `${today}T00:00:00.000Z`) // Start des Tages
+      .lt("created_at", `${today}T23:59:59.999Z`) // Ende des Tages
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Fehler beim Laden des neuesten Eintrags:", error.message);
+    } else if (!data) {
+      console.log("Kein Eintrag für heute gefunden.");
+    } else {
+      console.log("Neuester Eintrag von heute:", data);
+    }
+
+    if (error) throw error;
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+getTodayStressForUserAction;
+
 export async function getStressForDepartmentAction({
   department_id,
 }: {
@@ -75,8 +120,18 @@ export async function getStressForDepartmentAction({
   }
 }
 
-export async function createStressAction(newStress: NewStress) {
+export async function createStressAction({
+  newStress,
+}: {
+  newStress: NewStress;
+}) {
   const supabase = await createClient();
+  const user = await getUserByToken();
+
+  newStress = {
+    ...newStress,
+    user_id: user?.id,
+  } as NewStress;
 
   try {
     const { data, error } = await supabase
@@ -96,6 +151,10 @@ export async function updateStressAction(
   updates: UpdateStress
 ) {
   const supabase = await createClient();
+
+  updates = {
+    ...updates,
+  } as NewStress;
 
   try {
     const { error } = await supabase

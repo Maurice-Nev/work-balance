@@ -22,6 +22,7 @@ import { getSelf } from "@/hooks/useAuth";
 import { NavMain } from "./navMain";
 import Link from "next/link";
 import { validateUserSession } from "@/actions/authAction";
+import Logo from "../logo";
 
 let data = {
   user: {
@@ -72,14 +73,14 @@ export function AdminSidebar({
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <Link
-                href="#"
-                className="flex items-center gap-2 self-center mt-5 h-10 font-medium"
-              >
-                <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
+              <Link href="#" className=" mt-5 h-10 font-medium">
+                {/* <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
                   <GalleryVerticalEnd className="size-4" />
                 </div>
-                <span className="text-lg font-semibold">Roccomedia</span>
+                <span className="text-lg font-semibold">Roccomedia</span> */}
+                <div className=" flex size-6 items-center justify-center h-10 w-full rounded-md bg-muted border shadow">
+                  <Logo className="" />
+                </div>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

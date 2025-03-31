@@ -29,12 +29,17 @@ export async function getAllRatingsAction() {
   const supabase = await createClient();
 
   try {
-    const { data, error } = await supabase.from("rating").select(`
+    const { data, error } = await supabase
+      .from("rating")
+      .select(
+        `
         *,
         department (
           name
         )
-      `);
+      `
+      )
+      .order("created_at", { ascending: false });
 
     if (error) throw error;
     return data as (Rating & {

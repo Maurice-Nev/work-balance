@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import data from "./data.json";
 import DepartmentForm from "../forms/departmentForm";
 import { DepartmentModal } from "../components/departmentModal";
-import { useGetAllDepartments } from "@/hooks/department";
+import { useGetAllDepartments } from "@/hooks/useDepartment";
 
 export interface DepartmentPageProps {
   initialDepartments?: Array<{

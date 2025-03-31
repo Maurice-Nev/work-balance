@@ -51,7 +51,15 @@ import {
   TrendingDownIcon,
   TrendingUpIcon,
 } from "lucide-react";
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -580,12 +588,12 @@ export function DataTable({
 }
 
 export const chartConfig = {
-  avgRating: {
-    label: "Avg Rating",
+  desktop: {
+    label: "Desktop",
     color: "hsl(var(--chart-1))",
   },
-  commentCount: {
-    label: "Comment Count",
+  mobile: {
+    label: "Mobile",
     color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig;
@@ -714,7 +722,7 @@ function TableCellViewer({ item }: { item: Department }) {
         <div className="flex flex-1 flex-col gap-4 overflow-y-auto py-4 text-sm">
           {!isMobile && (
             <>
-              <ChartContainer config={chartConfig}>
+              {/* <ChartContainer config={chartConfig}>
                 <AreaChart data={chartData} margin={{ left: 0, right: 10 }}>
                   <CartesianGrid vertical={false} />
                   <XAxis dataKey="week" />
@@ -735,6 +743,33 @@ function TableCellViewer({ item }: { item: Department }) {
                     fill="hsl(var(--chart-2))"
                   />
                 </AreaChart>
+              </ChartContainer> */}
+              <ChartContainer config={chartConfig}>
+                <BarChart accessibilityLayer data={chartData}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis
+                    dataKey="week"
+                    // tickLine={false}
+                    // tickMargin={10}
+                    // axisLine={false}
+                    // tickFormatter={(value) => value.slice(0, 3)}
+                  />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent indicator="dashed" />}
+                  />
+                  <Bar
+                    dataKey="avgRating"
+                    label="desktop"
+                    fill="var(--color-desktop)"
+                    radius={4}
+                  />
+                  <Bar
+                    dataKey="commentCount"
+                    fill="var(--color-mobile)"
+                    radius={4}
+                  />
+                </BarChart>
               </ChartContainer>
               <Separator />
 

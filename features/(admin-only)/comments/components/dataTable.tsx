@@ -138,11 +138,13 @@ const columns: ColumnDef<z.infer<typeof UserSchema>>[] = [
         variant="outline"
         className={cn(
           "px-2 py-1",
-          row.original.rating && row?.original?.rating < 3
-            ? "text-destructive"
-            : row.original.rating && row.original.rating < 4
-            ? "text-yellow-500"
-            : "text-green-500"
+          row.original.rating &&
+            (row?.original?.rating < 3
+              ? "text-destructive"
+              : row.original.rating &&
+                (row.original.rating < 4
+                  ? "text-yellow-500"
+                  : "text-green-500"))
         )}
       >
         {row?.original.rating}

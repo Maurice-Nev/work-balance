@@ -14,7 +14,10 @@ import {
   updateStressAction,
   createStressAction,
   getStressAction,
+  getTodayStressForUserAction,
 } from "@/actions/stressAction";
+import { toast } from "sonner";
+import { useMemo } from "react";
 
 export const useGetStress = ({ stress_id }: { stress_id: string }) => {
   return useQuery({
@@ -48,6 +51,17 @@ export const useGetStressForUser = ({ user_id }: { user_id: string }) => {
   });
 };
 
+export const useGetTodayStressForUser = () => {
+  const queryKey = useMemo(() => "getTodayStressForUser", []);
+  return useQuery({
+    queryKey: [queryKey],
+    queryFn: async () => {
+      const stress = await getTodayStressForUserAction();
+      return stress;
+    },
+  });
+};
+
 export const useGetStressForDepartment = ({
   department_id,
 }: {
@@ -70,11 +84,16 @@ export const useCreateStress = () => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (newStress: NewStress) => {
-      return await createStressAction(newStress);
+    mutationFn: async ({ newStress }: { newStress: NewStress }) => {
+      return await createStressAction({ newStress });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["getAllStress"] }); // Aktualisiert den Cache
+    onSuccess: (res) => {
+      if (res) {
+        toast.success("Created successfull!", {});
+      } else {
+        toast.success("Error!", {});
+      }
+      queryClient.invalidateQueries({ queryKey: ["getTodayStressForUser"] });
     },
   });
   return mutation;
@@ -93,8 +112,15 @@ export const useUpdateStress = () => {
     }) => {
       return await updateStressAction(stress_id, updates);
     },
-    onSuccess: (_, { stress_id }) => {
-      queryClient.invalidateQueries({ queryKey: ["getStress", stress_id] }); // Aktualisiert nur diesen Eintrag
+    onSuccess: (res) => {
+      if (res.success) {
+        toast.success("Update successfull!", {});
+        queryClient.invalidateQueries({
+          queryKey: ["getTodayStressForUser"],
+        }); // Aktualisiert nur diesen Eintrag
+      } else {
+        toast.success("Error!", {});
+      }
     },
   });
   return mutation;

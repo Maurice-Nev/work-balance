@@ -5,6 +5,7 @@ import {
   createDepartmentAction,
   deleteDepartmentAction,
   getAllDepartmentsAction,
+  getAllDepartmentsWithoutRatings,
   getDepartmentAction,
   updateDepartmentAction,
 } from "@/actions/departmentAction";
@@ -42,6 +43,19 @@ export const useGetAllDepartments = () => {
     queryKey: [queryKey],
     queryFn: useCallback(async () => {
       return await getAllDepartmentsAction();
+    }, []),
+    staleTime: 1000 * 30,
+  });
+  return query;
+};
+
+export const useGetAllDepartmentsWithoutRatings = () => {
+  const queryKey = useMemo(() => "getAllDepartmentsWithoutRatings", []);
+
+  const query = useQuery({
+    queryKey: [queryKey],
+    queryFn: useCallback(async () => {
+      return await getAllDepartmentsWithoutRatings();
     }, []),
     staleTime: 1000 * 30,
   });

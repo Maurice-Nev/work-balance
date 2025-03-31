@@ -206,6 +206,7 @@ export async function getUserByToken() {
       .select("*, role:role_id(*)")
       .eq("id", session?.user_id as string)
       .single();
+
     if (UserError) {
       throw UserError;
     }

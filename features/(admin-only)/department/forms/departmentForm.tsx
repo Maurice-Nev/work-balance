@@ -6,7 +6,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import { DepartmentFormSchema } from "./validation/departmentVal";
-import { useCreateDepartment, useUpdateDepartment } from "@/hooks/department";
+import {
+  useCreateDepartment,
+  useUpdateDepartment,
+} from "@/hooks/useDepartment";
 import BasicInput from "@/components/formInputs/BasicInput";
 import { NewDepartment } from "@/supabase/types/database.models";
 
