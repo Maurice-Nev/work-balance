@@ -10,7 +10,7 @@ export const StressComponent = () => {
     <div className="w-full h-44 rounded-lg px-4 py-3 mt-1 border my-6">
       tracking stuff / Charts
       {/* <pre>{JSON.stringify(stress, null, 2)}</pre> */}
-      <StressModal initialValues={(stress as Stress) || undefined} />
+      <StressModal initialValues={stress as Stress} />
     </div>
   );
 };

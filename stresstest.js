@@ -21,7 +21,7 @@ export let options = {
 
 export default function () {
   let headers = {
-    'Cookie': 'sessionToken=88d4194f-b623-4859-9c69-fb1d8fff463a',
+    'Cookie': 'sessionToken=dffe04e2-a90d-419d-b6a9-5d5b2ecd6511',
   };
 
   let baseUrl = 'http://host.docker.internal:3000';

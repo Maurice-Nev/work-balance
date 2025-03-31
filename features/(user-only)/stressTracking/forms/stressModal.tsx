@@ -39,10 +39,7 @@ export function StressModal({ children, initialValues }: StressModalProps) {
           </DialogTitle>
         </DialogHeader>
         <div className="p-4">
-          <CommentForm
-            // department_id={department_id}
-            initialValues={(initialValues as Stress) || undefined}
-          />
+          <CommentForm initialValues={initialValues as Stress} />
         </div>
       </DialogContent>
     </Dialog>

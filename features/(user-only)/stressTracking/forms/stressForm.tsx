@@ -55,20 +55,20 @@ export const CommentForm = ({
           <SelectInput
             control={form.control}
             validationFieldName="department_id"
-            label="Abteilung"
-            placeholder="Wähle eine Abteilung"
+            label="Department"
+            placeholder="Choose your department"
             options={
               options?.map((item) => ({
-                label: item.name || "Unbenannt",
+                label: item.name || "Unknown",
                 value: item.id,
               })) || []
             }
-            description="Please choose your department"
+            // description="Please choose your department"
             className="w-full"
           />
           <NumberInput
             control={form.control}
-            label="Stress"
+            label="How is your stress Lvl today?"
             placeholder="2"
             validationFieldName="stress"
           />
