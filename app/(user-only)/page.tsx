@@ -25,6 +25,10 @@ export default async function Page() {
     queryKey: ["getTodayStressForUser"],
     queryFn: getAllDepartmentsAction,
   });
+  await queryClient.prefetchQuery({
+    queryKey: ["getStressForUser"],
+    queryFn: getAllDepartmentsAction,
+  });
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

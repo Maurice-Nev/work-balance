@@ -61,3 +61,26 @@ SELECT
     END,
     NOW() - INTERVAL '1 DAY' * FLOOR(RANDOM() * 100)  -- Zufällige Erstellungszeit über die letzten 7 Tage
 FROM public.department d, generate_series(1, 100);
+
+-- Generiere Stresslevel-Daten für die letzten 8 Wochen (56 Tage)
+
+-- Setze das Start- und Enddatum
+WITH dates AS (
+    SELECT (NOW()::DATE - INTERVAL '8 weeks') + (i * INTERVAL '1 day') AS date
+    FROM generate_series(0, 55) AS i
+),
+users AS (
+    SELECT id FROM public."user"
+),
+departments AS (
+    SELECT id FROM public.department ORDER BY RANDOM() LIMIT 1
+)
+-- Füge Stresslevel-Daten hinzu
+INSERT INTO public.stress (id, user_id, department_id, stress, created_at)
+SELECT 
+    gen_random_uuid(),
+    u.id,
+    d.id,
+    FLOOR(RANDOM() * 10) + 1,
+    dates.date
+FROM users u, departments d, dates;

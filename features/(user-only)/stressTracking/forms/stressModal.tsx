@@ -17,12 +17,16 @@ interface StressModalProps extends React.HTMLAttributes<HTMLDivElement> {
   initialValues?: Stress;
 }
 
-export function StressModal({ children, initialValues }: StressModalProps) {
+export function StressModal({
+  children,
+  initialValues,
+  className,
+}: StressModalProps) {
   const [open, onOpenChange] = React.useState(false);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
+      <DialogTrigger asChild className={className}>
         {children ? (
           children
         ) : (

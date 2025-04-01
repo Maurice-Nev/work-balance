@@ -40,14 +40,13 @@ export const useGetAllStressEntries = () => {
   });
 };
 
-export const useGetStressForUser = ({ user_id }: { user_id: string }) => {
+export const useGetStressForUser = () => {
+  const queryKey = useMemo(() => "getStressForUser", []);
   return useQuery({
-    queryKey: ["getStressForUser", user_id],
+    queryKey: [queryKey],
     queryFn: async () => {
-      const stress: Stress[] = await getStressForUserAction({ user_id });
-      return stress;
+      return await getStressForUserAction();
     },
-    enabled: !!user_id,
   });
 };
 
@@ -93,7 +92,12 @@ export const useCreateStress = () => {
       } else {
         toast.success("Error!", {});
       }
-      queryClient.invalidateQueries({ queryKey: ["getTodayStressForUser"] });
+      queryClient.invalidateQueries({
+        queryKey: ["getTodayStressForUser"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["getStressForUser"],
+      });
     },
   });
   return mutation;
@@ -118,6 +122,9 @@ export const useUpdateStress = () => {
         queryClient.invalidateQueries({
           queryKey: ["getTodayStressForUser"],
         }); // Aktualisiert nur diesen Eintrag
+        queryClient.invalidateQueries({
+          queryKey: ["getStressForUser"],
+        });
       } else {
         toast.success("Error!", {});
       }

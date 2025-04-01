@@ -38,14 +38,30 @@ export async function getAllStressEntriesAction() {
   }
 }
 
-export async function getStressForUserAction({ user_id }: { user_id: string }) {
+export async function getStressForUserAction() {
   const supabase = await createClient();
 
   try {
+    const user = await getUserByToken();
+
+    if (!user) {
+      throw {
+        name: "stress",
+        message: "User not logged in",
+        statusCode: 500,
+      };
+    }
+
+    // Datum der letzten 8 Wochen berechnen
+    const eightWeeksAgo = new Date();
+    eightWeeksAgo.setDate(eightWeeksAgo.getDate() - 56); // 8 Wochen * 7 Tage
+
     const { data, error } = await supabase
       .from("stress")
       .select("*")
-      .eq("user_id", user_id);
+      .eq("user_id", user.id)
+      .gte("created_at", eightWeeksAgo.toISOString()) // Nur die letzten 8 Wochen
+      .order("created_at", { ascending: true });
 
     if (error) throw error;
 
