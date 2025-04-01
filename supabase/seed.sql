@@ -1,15 +1,16 @@
+-- Rollen einfügen
 INSERT INTO role (id, name, created_at) VALUES
   (gen_random_uuid(), 'Superadmin', NOW()),
   (gen_random_uuid(), 'Admin', NOW()),
   (gen_random_uuid(), 'User', NOW())
 ON CONFLICT (id) DO NOTHING;
 
-
+-- Superadmin-Benutzer einfügen
 INSERT INTO "user" (id, email, password, name, surname, role_id, created_at) 
 VALUES (
   gen_random_uuid(), 
   'admin@admin.com', 
-  crypt('liwasabo', gen_salt('bf', 10)),  -- Verschlüsselung direkt in SQL
+  crypt('liwasabo', gen_salt('bf', 10)),  
   'Super', 
   'Admin', 
   (SELECT id FROM role WHERE name = 'Superadmin' LIMIT 1), 
@@ -17,6 +18,7 @@ VALUES (
 )
 ON CONFLICT (email) DO NOTHING;
 
+-- Beispiel-Benutzer einfügen
 INSERT INTO "user" (id, email, password, name, surname, role_id, created_at)
 SELECT 
     gen_random_uuid(), 
@@ -29,16 +31,15 @@ SELECT
 FROM generate_series(1, 100) AS i
 ON CONFLICT (email) DO NOTHING;
 
-
 -- Erstelle 10 Departments mit zufälligen Namen
 INSERT INTO public.department (id, name, created_at)
 SELECT
     gen_random_uuid(),
     'Department ' || i,
-    NOW() - INTERVAL '1 DAY' * FLOOR(RANDOM() * 7)  -- Erstellungsdatum zufällig in den letzten 7 Tagen
-FROM generate_series(1, 10) i;
+    NOW() - INTERVAL '1 DAY' * FLOOR(RANDOM() * 7) 
+FROM generate_series(1, 10) AS i;
 
--- Kommentare für Bewertungen zufällig auswählen (ohne Array-Syntax)
+-- Kommentare für Bewertungen
 WITH random_comments AS (
     SELECT unnest(ARRAY[
         'Great service!',
@@ -54,17 +55,15 @@ INSERT INTO public.rating (id, department_id, rating, comment, created_at)
 SELECT
     gen_random_uuid(),
     d.id,
-    FLOOR(RANDOM() * 5) + 1,  -- Zufällige Bewertung zwischen 1 und 5
+    FLOOR(RANDOM() * 5) + 1,  
     CASE 
         WHEN RANDOM() > 0.2 THEN (SELECT comment_text FROM random_comments ORDER BY RANDOM() LIMIT 1)
         ELSE NULL 
     END,
-    NOW() - INTERVAL '1 DAY' * FLOOR(RANDOM() * 100)  -- Zufällige Erstellungszeit über die letzten 7 Tage
+    NOW() - INTERVAL '1 DAY' * FLOOR(RANDOM() * 100)
 FROM public.department d, generate_series(1, 100);
 
 -- Generiere Stresslevel-Daten für die letzten 8 Wochen (56 Tage)
-
--- Setze das Start- und Enddatum
 WITH dates AS (
     SELECT (NOW()::DATE - INTERVAL '8 weeks') + (i * INTERVAL '1 day') AS date
     FROM generate_series(0, 55) AS i
@@ -73,9 +72,9 @@ users AS (
     SELECT id FROM public."user"
 ),
 departments AS (
-    SELECT id FROM public.department ORDER BY RANDOM() LIMIT 1
+    SELECT id FROM public.department
 )
--- Füge Stresslevel-Daten hinzu
+-- Füge Stresslevel-Daten für jede Kombination aus User, Department und Datum hinzu
 INSERT INTO public.stress (id, user_id, department_id, stress, created_at)
 SELECT 
     gen_random_uuid(),

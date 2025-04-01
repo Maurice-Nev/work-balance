@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TrendingUp } from "lucide-react";
 import {
   CartesianGrid,
   LabelList,
@@ -24,10 +23,10 @@ import {
 import {
   ChartConfig,
   ChartContainer,
-  ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Stress } from "@/supabase/types/database.models";
+import { StressModal } from "../forms/stressModal";
 
 const chartConfig = {
   stress: {
@@ -38,24 +37,26 @@ const chartConfig = {
 
 export function StressLineChart({
   data,
+  stress,
   companyData,
 }: {
   data: Stress[];
   companyData: Stress[];
+  stress: Stress;
 }) {
   const [visibleData, setVisibleData] = useState<Stress[]>(data);
 
-  // Berechnung der Durchschnittswerte und Stressspitzen
-  // Persönlicher Durchschnitt
+  // Calculation of averages and stress peaks
+  // Personal average
   const personalAverage =
     data.reduce((sum, item) => sum + (item.stress ?? 0), 0) / data.length || 0;
 
-  // Unternehmensdurchschnitt
+  // Company average
   const companyAverage =
     companyData.reduce((sum, item) => sum + (item.stress ?? 0), 0) /
       companyData.length || 0;
 
-  // Stressspitzenberechnung
+  // Calculation of stress peaks
   const stressSpikes = data.filter((item) => (item.stress ?? 0) >= 8);
   const spikeCount = stressSpikes.length;
   const spikeAverage =
@@ -67,15 +68,15 @@ export function StressLineChart({
   useEffect(() => {
     const updateChartData = () => {
       const screenWidth = window.innerWidth;
-      let dataLength = 56; // Standard: 8 Wochen
+      let dataLength = 56; // Standard: 8 weeks
 
       if (screenWidth < 600) {
-        dataLength = 14; // Mobile: 2 Wochen
+        dataLength = 14; // Mobile: 2 weeks
       } else if (screenWidth < 900) {
-        dataLength = 28; // Tablet: 4 Wochen
+        dataLength = 28; // Tablet: 4 weeks
       }
 
-      const latestData = data.slice(-dataLength); // Neueste Einträge von hinten
+      const latestData = data.slice(-dataLength); // Latest entries from the end
       setVisibleData(latestData);
     };
 
@@ -85,12 +86,15 @@ export function StressLineChart({
   }, [data]);
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Stresslevel - Verlauf</CardTitle>
-        <CardDescription>
-          Dynamisch angepasst für verschiedene Bildschirmgrößen
-        </CardDescription>
+    <Card className="w-full shadow-none">
+      <CardHeader className="flex flex-col w-full justify-between lg:flex-row">
+        <div>
+          <CardTitle>Stress Level - Trend</CardTitle>
+          <CardDescription>
+            Dynamically adjusted for different screen sizes
+          </CardDescription>
+        </div>
+        <StressModal className="shadow-none" initialValues={stress as Stress} />
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="max-h-[250px] w-full">
@@ -120,7 +124,7 @@ export function StressLineChart({
               />
               <Tooltip
                 content={<ChartTooltipContent indicator="line" />}
-                formatter={(value) => `Stresslevel: ${value}`}
+                formatter={(value) => `Stress Level: ${value}`}
               />
               <Line
                 dataKey="stress"
@@ -144,21 +148,25 @@ export function StressLineChart({
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex justify-between flex-col gap-4 lg:gap-0 lg:flex-row w-full my-4 py-4 border-y">
-          <div className="flex gap-2 font-medium leading-none">
-            Persönlicher Durchschnitt: {personalAverage.toFixed(2)}
+          <div className="flex gap-2 justify-between w-full lg:w-fit font-medium leading-none">
+            <div>Personal Average:</div>
+            <div>{personalAverage.toFixed(2)}</div>
           </div>
-          <div className="flex gap-2 font-medium leading-none">
-            Unternehmensdurchschnitt: {companyAverage.toFixed(2)}
+          <div className="flex gap-2 justify-between w-full lg:w-fit font-medium leading-none">
+            <div>Company Average:</div>
+            <div>{companyAverage.toFixed(2)}</div>
           </div>
-          <div className="flex gap-2 font-medium leading-none">
-            Stressspitzen (≥ 8): {spikeCount}
+          <div className="flex gap-2 justify-between w-full lg:w-fit font-medium leading-none">
+            <div>Stress Peaks (≥ 8):</div>
+            <div>{spikeCount}</div>
           </div>
-          <div className="flex gap-2 font-medium leading-none">
-            Durchschnitt: {spikeAverage.toFixed(2)}
+          <div className="flex gap-2 justify-between w-full lg:w-fit font-medium leading-none">
+            <div>Peak Average:</div>
+            <div>{spikeAverage.toFixed(2)}</div>
           </div>
         </div>
         <div className="leading-none text-muted-foreground">
-          Berechnung basierend auf den letzten 8 Wochen
+          Calculation based on the last 8 weeks
         </div>
       </CardFooter>
     </Card>

@@ -30,9 +30,9 @@ export function StressModal({
         {children ? (
           children
         ) : (
-          <Button variant="outline" size="sm">
+          <Button variant="outline" className="my-2 p-0 m-0" size="sm">
             <PlusIcon />
-            <span className="hidden lg:inline">Track your stress</span>
+            <span className="">Track your stress</span>
           </Button>
         )}
       </DialogTrigger>

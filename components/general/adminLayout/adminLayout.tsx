@@ -12,12 +12,12 @@ export default function AdminLayout({
   return (
     <SidebarProvider>
       <AdminSidebar />
-      <main className="w-full">
+      <main className="w-full overflow-hidden">
         <Card className="m-4 pt-0 gap-0 overflow-hidden">
           <CardHeader className="px-0 relative">
             <AdminHeader /> {/* Header bleibt sticky */}
           </CardHeader>
-          <CardContent className="h-screen-minus-header w-full overflow-auto">
+          <CardContent className="h-screen-minus-header w-full overflow-y-auto overflow-x-hidden">
             {props.children}
           </CardContent>
         </Card>

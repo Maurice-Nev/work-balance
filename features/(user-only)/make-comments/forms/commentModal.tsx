@@ -31,7 +31,7 @@ export function CommentModal({
         {children ? (
           children
         ) : (
-          <Button variant="outline" size="sm">
+          <Button variant="outline" className="shadow-none" size="sm">
             <PlusIcon />
             <span className="hidden lg:inline">Write Comment</span>
           </Button>

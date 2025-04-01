@@ -9,7 +9,7 @@ export default function UserLayout({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <main className="w-full">
-      <Card className="mx-4 mt-4 pt-0 gap-0 overflow-hidden">
+      <Card className="mx-4 mt-4 pt-0 gap-0 shadow-none overflow-hidden">
         <CardHeader className="px-0 relative">
           <UserHeader /> {/* Header bleibt sticky */}
         </CardHeader>
