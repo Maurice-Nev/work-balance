@@ -18,16 +18,16 @@ export default async function Home() {
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery({
-    queryKey: ["getHighStressDepartments"],
-    queryFn: getHighStressDepartments,
+    queryKey: ["getHighStressDepartments", "8_weeks"],
+    queryFn: async () => await getHighStressDepartments("8_weeks"),
   });
   await queryClient.prefetchQuery({
-    queryKey: ["getStressChangesOverTime", "8_weeks"],
-    queryFn: async () => await getStressChangesOverTime("8_weeks"),
+    queryKey: ["getStressChangesOverTime", "week"],
+    queryFn: async () => await getStressChangesOverTime("week"),
   });
   await queryClient.prefetchQuery({
-    queryKey: ["getAverageStressPerDepartment"],
-    queryFn: getAverageStressPerDepartment,
+    queryKey: ["getAverageStressPerDepartment", "week"],
+    queryFn: async () => await getAverageStressPerDepartment("week"),
   });
 
   return (

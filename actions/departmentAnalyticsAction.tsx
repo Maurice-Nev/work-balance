@@ -1,29 +1,84 @@
 "use server";
 import { createClient } from "@/supabase/server";
 
-export async function getAverageStressPerDepartment() {
+export async function getAverageStressPerDepartment(
+  period: "week" | "month" | "8_weeks"
+) {
   const supabase = await createClient();
 
   try {
-    // Abrufen aller Abteilungen
-    const { data: departments, error: departmentError } = await supabase
-      .from("department")
-      .select("id, name");
+    // Zeitraum dynamisch bestimmen
+    let interval: number;
+    switch (period) {
+      case "week":
+        interval = 7;
+        break;
+      case "month":
+        interval = 30;
+        break;
+      case "8_weeks":
+        interval = 56;
+        break;
+      default:
+        throw new Error("Invalid period");
+    }
 
-    if (departmentError) throw departmentError;
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - interval);
+
+    // Chunking-Funktion zum Abrufen von Abteilungen
+    async function fetchAllDepartments() {
+      const departments = [];
+      let from = 0;
+      const chunkSize = 1000;
+
+      while (true) {
+        const { data, error } = await supabase
+          .from("department")
+          .select("id, name")
+          .range(from, from + chunkSize - 1);
+
+        if (error) throw error;
+        if (data.length === 0) break;
+
+        departments.push(...data);
+        from += chunkSize;
+      }
+      return departments;
+    }
+
+    const departments = await fetchAllDepartments();
 
     const averageStressPerDepartment = await Promise.all(
       departments.map(async (department) => {
-        const { data: stressData, error: stressError } = await supabase
-          .from("stress")
-          .select("stress")
-          .eq("department_id", department.id);
+        // Chunking-Funktion zum Abrufen von Stresswerten
+        async function fetchStressData() {
+          const stressValues = [];
+          let from = 0;
+          const chunkSize = 1000;
 
-        if (stressError) throw stressError;
+          while (true) {
+            const { data, error } = await supabase
+              .from("stress")
+              .select("stress")
+              .eq("department_id", department.id)
+              .gte("created_at", startDate.toISOString()) // Zeitraumfilter
+              .range(from, from + chunkSize - 1);
+
+            if (error) throw error;
+            if (data.length === 0) break;
+
+            stressValues.push(...data);
+            from += chunkSize;
+          }
+          return stressValues;
+        }
+
+        const stressData = await fetchStressData();
 
         // Filtere nur gültige Stresswerte (keine Nullwerte)
         const validStressValues = stressData
-          .filter((item) => item.stress !== null)
+          .filter((item) => item.stress !== null && item.stress !== undefined)
           .map((item) => item.stress as number);
 
         if (validStressValues.length === 0) {
@@ -76,64 +131,75 @@ export async function getStressChangesOverTime(
 
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - interval);
-    // Abrufen aller Stresswerte innerhalb des Zeitraums
-    const { data, error } = await supabase
-      .from("stress")
-      .select("created_at, stress, department_id, department(name)")
-      .gte("created_at", startDate.toISOString());
 
-    if (error) throw error;
+    // Chunking-Funktion zum Abrufen von Stresswerten
+    async function fetchStressData() {
+      const stressData = [];
+      let from = 0;
+      const chunkSize = 1000;
 
-    // Gruppierung der Daten nach Abteilung und Datum
+      while (true) {
+        const { data, error } = await supabase
+          .from("stress")
+          .select("created_at, stress, department_id, department(name)")
+          .gte("created_at", startDate.toISOString())
+          .range(from, from + chunkSize - 1); // Chunkweise Abruf
+
+        if (error) throw error;
+        if (data.length === 0) break;
+
+        stressData.push(...data);
+        from += chunkSize;
+      }
+      return stressData;
+    }
+
+    const data = await fetchStressData();
+
+    // Gruppierung der Daten nach Abteilungs-ID (String) und Datum
     const departmentMap: {
-      [key: string]: { [date: string]: number[] };
+      [id: string]: { name: string; stressData: { [date: string]: number[] } };
     } = {};
 
     data?.forEach((item) => {
+      const departmentId = item.department_id?.toString();
       const departmentName = item.department?.name ?? "Unknown";
-      const period = item.created_at?.slice(0, 10); // Nur Datumsteil
-      const stress = item.stress ?? 0;
+      const date = item.created_at?.slice(0, 10); // Nur Datumsteil
+      const stress = item.stress ?? null;
+
+      if (stress === null || !departmentId) return;
 
       // Initialisiere die Abteilung, falls nicht vorhanden
-      if (!departmentMap[departmentName]) {
-        departmentMap[departmentName] = {};
+      if (!departmentMap[departmentId]) {
+        departmentMap[departmentId] = {
+          name: departmentName,
+          stressData: {},
+        };
       }
 
       // Initialisiere das Datum innerhalb der Abteilung, falls nicht vorhanden
-      if (!departmentMap[departmentName][period]) {
-        departmentMap[departmentName][period] = [];
+      if (!departmentMap[departmentId].stressData[date]) {
+        departmentMap[departmentId].stressData[date] = [];
       }
 
       // Füge den Stresswert zum entsprechenden Datum hinzu
-      departmentMap[departmentName][period].push(stress);
+      departmentMap[departmentId].stressData[date].push(stress);
     });
-    // console.log(departmentMap);
 
     // Formatierung der Ergebnisse mit Durchschnittsberechnung pro Tag
-    const formattedData = Object.keys(departmentMap).map((departmentName) => {
-      // Erzeuge eine Liste aller Tage im Zeitraum, um fehlende Tage aufzufüllen
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - interval);
-      const today = new Date();
-
-      const dateList: string[] = [];
-      const currentDate = new Date(startDate);
-
-      while (currentDate <= today) {
-        dateList.push(currentDate.toISOString().slice(0, 10));
-        currentDate.setDate(currentDate.getDate() + 1);
-      }
+    const formattedData = Object.keys(departmentMap).map((departmentId) => {
+      const departmentName = departmentMap[departmentId].name;
 
       // Verarbeite die Stresswerte für jedes Datum in der Periode
-      const stressValues = dateList.map((date) => {
-        const dailyStressValues = departmentMap[departmentName][date] || [];
+      const stressValues = Object.keys(
+        departmentMap[departmentId].stressData
+      ).map((date) => {
+        const dailyStressValues = departmentMap[departmentId].stressData[date];
 
-        // Durchschnitt berechnen, auch wenn keine Werte vorliegen
+        // Durchschnitt berechnen
         const avg_stress =
-          dailyStressValues.length > 0
-            ? dailyStressValues.reduce((sum, value) => sum + value, 0) /
-              dailyStressValues.length
-            : 0;
+          dailyStressValues.reduce((sum, value) => sum + value, 0) /
+          dailyStressValues.length;
 
         return {
           period: date,
@@ -147,6 +213,7 @@ export async function getStressChangesOverTime(
       );
 
       return {
+        department_id: departmentId,
         department_name: departmentName,
         stress_values: stressValues,
       };
@@ -159,26 +226,79 @@ export async function getStressChangesOverTime(
   }
 }
 
-export async function getHighStressDepartments() {
+export async function getHighStressDepartments(
+  period: "week" | "month" | "8_weeks"
+) {
   const supabase = await createClient();
 
   try {
-    // Abrufen aller Abteilungen
-    const { data: departments, error: departmentError } = await supabase
-      .from("department")
-      .select("id, name");
+    // Zeitraum dynamisch bestimmen
+    let interval: number;
+    switch (period) {
+      case "week":
+        interval = 7;
+        break;
+      case "month":
+        interval = 30;
+        break;
+      case "8_weeks":
+        interval = 56;
+        break;
+      default:
+        throw new Error("Invalid period");
+    }
 
-    if (departmentError) throw departmentError;
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - interval);
+
+    // Funktion zum Abrufen von Daten in Chunks
+    async function fetchAllDepartments() {
+      const departments = [];
+      let from = 0;
+      const chunkSize = 1000;
+
+      while (true) {
+        const { data, error } = await supabase
+          .from("department")
+          .select("id, name")
+          .range(from, from + chunkSize - 1);
+
+        if (error) throw error;
+        if (data.length === 0) break;
+
+        departments.push(...data);
+        from += chunkSize;
+      }
+      return departments;
+    }
+
+    const departments = await fetchAllDepartments();
 
     const highStressDepartments = await Promise.all(
       departments.map(async (department) => {
-        // Durchschnittlicher Stresswert abrufen
-        const { data: stressData, error: stressError } = await supabase
-          .from("stress")
-          .select("stress")
-          .eq("department_id", department.id);
+        // Funktion zum Abrufen von Stresswerten in Chunks
+        async function fetchStressData() {
+          const stressValues = [];
+          let from = 0;
 
-        if (stressError) throw stressError;
+          while (true) {
+            const { data, error } = await supabase
+              .from("stress")
+              .select("stress")
+              .eq("department_id", department.id)
+              .gte("created_at", startDate.toISOString())
+              .range(from, from + 999); // 1000 pro Chunk
+
+            if (error) throw error;
+            if (data.length === 0) break;
+
+            stressValues.push(...data);
+            from += 1000;
+          }
+          return stressValues;
+        }
+
+        const stressData = await fetchStressData();
 
         // Filtere nur gültige Stresswerte (keine Nullwerte)
         const validStressValues = stressData
@@ -193,16 +313,33 @@ export async function getHighStressDepartments() {
           validStressValues.reduce((sum, value) => sum + value, 0) /
           validStressValues.length;
 
-        // Negative Bewertungen abrufen
-        const { data: negativeReviews, error: reviewError } = await supabase
-          .from("rating")
-          .select("id")
-          .eq("department_id", department.id)
-          .lte("rating", 2);
+        // Negative Bewertungen abrufen (auch in Chunks)
+        async function fetchNegativeReviews() {
+          const negativeReviews = [];
+          let from = 0;
 
-        if (reviewError) throw reviewError;
+          while (true) {
+            const { data, error } = await supabase
+              .from("rating")
+              .select("id")
+              .eq("department_id", department.id)
+              .gte("created_at", startDate.toISOString())
+              .lte("rating", 2)
+              .range(from, from + 999);
 
-        if (averageStress >= 8 || (negativeReviews?.length ?? 0) > 5) {
+            if (error) throw error;
+            if (data.length === 0) break;
+
+            negativeReviews.push(...data);
+            from += 1000;
+          }
+          return negativeReviews;
+        }
+
+        const negativeReviews = await fetchNegativeReviews();
+
+        // Filter: Nur Abteilungen mit hohem Stresswert oder vielen negativen Bewertungen
+        if (averageStress >= 8 || (negativeReviews?.length ?? 0) > 15) {
           return {
             department_name: department.name,
             avg_stress: parseFloat(averageStress.toFixed(2)),

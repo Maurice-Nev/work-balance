@@ -15,6 +15,7 @@ import {
   UpdateRating,
 } from "@/supabase/types/database.models";
 import { toast } from "sonner";
+import { Period } from "./useDepartmentAnalytics";
 
 export const useGetRating = ({ rating_id }: { rating_id: string }) => {
   return useQuery({
@@ -39,14 +40,17 @@ export const useGetAllRatings = () => {
 
 export const useGetRatingsForDepartment = ({
   department_id,
+  period,
 }: {
   department_id: string;
+  period?: Period;
 }) => {
   return useQuery({
     queryKey: ["getRatingsForDepartment", department_id],
     queryFn: async () => {
       const ratings: Rating[] = await getRatingsForDepartmentAction({
         department_id,
+        period,
       });
       return ratings;
     },

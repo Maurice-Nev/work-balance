@@ -7,15 +7,21 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useCallback } from "react";
 
-type Period = "week" | "month" | "8_weeks";
+export type Period = "week" | "month" | "8_weeks";
 
-export const useGetAverageStressPerDepartment = () => {
-  const queryKey = useMemo(() => "getAverageStressPerDepartment", []);
-
+export const useGetAverageStressPerDepartment = ({
+  period,
+}: {
+  period: Period;
+}) => {
+  const queryKey = useMemo(
+    () => ["getAverageStressPerDepartment", period],
+    [period]
+  );
   const query = useQuery({
     queryKey: [queryKey],
     queryFn: useCallback(async () => {
-      return await getAverageStressPerDepartment();
+      return await getAverageStressPerDepartment(period);
     }, []),
     staleTime: 1000 * 30, // Cache for 30 seconds
   });
@@ -23,13 +29,15 @@ export const useGetAverageStressPerDepartment = () => {
   return query;
 };
 
-export const useGetHighStressDepartments = () => {
-  const queryKey = useMemo(() => "getHighStressDepartments", []);
-
+export const useGetHighStressDepartments = ({ period }: { period: Period }) => {
+  const queryKey = useMemo(
+    () => ["getHighStressDepartments", period],
+    [period]
+  );
   const query = useQuery({
     queryKey: [queryKey],
     queryFn: useCallback(async () => {
-      return await getHighStressDepartments();
+      return await getHighStressDepartments(period);
     }, []),
     staleTime: 1000 * 30, // Cache for 30 seconds
   });
