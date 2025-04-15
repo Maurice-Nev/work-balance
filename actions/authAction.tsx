@@ -185,10 +185,14 @@ export async function getUserByToken() {
       .from("session")
       .select()
       .eq("token", sessionToken.value)
-      .single();
+      .maybeSingle();
 
     if (sessionError) {
       throw sessionError;
+    }
+
+    if (!session) {
+      return null;
     }
 
     if (!session.user_id) {

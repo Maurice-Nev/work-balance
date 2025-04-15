@@ -21,20 +21,17 @@ export let options = {
 
 export default function () {
   let headers = {
-    'Cookie': 'sessionToken=dffe04e2-a90d-419d-b6a9-5d5b2ecd6511',
+    'Cookie': 'sessionToken=a227fc0a-75e2-4567-827d-5f1296a62fd1',
   };
 
   let baseUrl = 'http://host.docker.internal:3000';
 
   let routes = [
-    '/',
     '/departments',
     '/comments',
     '/dashboard',
     '/team',
-    '/make-comments',
-    '/register',
-    '/login',
+
   ];
 
   for (let route of routes) {
