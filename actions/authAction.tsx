@@ -198,11 +198,6 @@ export async function getUserByToken() {
     if (!session.user_id) {
       cookie.delete("sessionToken");
       return null;
-      throw {
-        name: "auth",
-        message: "User does not exist",
-        statusCode: 500,
-      };
     }
 
     const { data: User, error: UserError } = await supabase
@@ -292,7 +287,7 @@ export async function validateUserSession() {
   const cookie = await cookies();
 
   try {
-    const sessionToken = await cookie.get("sessionToken");
+    const sessionToken = cookie.get("sessionToken");
     if (!sessionToken) {
       return { authorized: false };
     }

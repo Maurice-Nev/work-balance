@@ -100,9 +100,9 @@ export async function getTodayStressForUserAction() {
     if (error) {
       console.error("Fehler beim Laden des neuesten Eintrags:", error.message);
     } else if (!data) {
-      console.log("Kein Eintrag für heute gefunden.");
+      // console.log("Kein Eintrag für heute gefunden.");
     } else {
-      console.log("Neuester Eintrag von heute:", data);
+      // console.log("Neuester Eintrag von heute:", data);
     }
 
     if (error) throw error;
@@ -113,7 +113,7 @@ export async function getTodayStressForUserAction() {
   }
 }
 
-getTodayStressForUserAction;
+// getTodayStressForUserAction;
 
 export async function getStressForDepartmentAction({
   department_id,
