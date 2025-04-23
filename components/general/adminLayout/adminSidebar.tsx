@@ -28,7 +28,7 @@ let data = {
   user: {
     name: `shadcn`,
     email: "e@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    avatar: "",
   },
   navMain: [
     {
@@ -60,7 +60,7 @@ export function AdminSidebar({
       user: {
         name: `${userData?.user?.name} ${userData?.user?.surname}`,
         email: userData?.user?.email as string,
-        avatar: "/avatars/shadcn.jpg",
+        avatar: "",
       },
     };
   }
