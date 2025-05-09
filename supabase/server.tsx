@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import {
   SupabaseClient,
   createClient as createSupabaseClient,
-} from "@supabase/supabase-js"; // Fix ✅
+} from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { Database } from "./types/database.types";
 
