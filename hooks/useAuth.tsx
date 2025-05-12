@@ -7,45 +7,64 @@ import {
   validateUserSession,
 } from "@/actions/authAction";
 import { NewUser } from "@/supabase/types/database.models";
-import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import {
+  QueryClient,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { parseCookies } from "nookies";
 
+interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+interface RegisterData {
+  newUser: NewUser;
+}
+
+/**
+ * Hook for handling user login
+ * @returns Mutation object for login operation
+ */
 export const useLogin = () => {
   const router = useRouter();
-  const mutation = useMutation({
-    mutationFn: async ({
-      email,
-      password,
-    }: {
-      email: string;
-      password: string;
-    }) => {
-      const res = await login({ email: email, password: password });
+  return useMutation({
+    mutationFn: async ({ email, password }: LoginCredentials) => {
+      const res = await login({ email, password });
       router.push("/");
       return res;
     },
   });
-  return mutation;
 };
 
+/**
+ * Hook for handling user registration
+ * @returns Mutation object for registration operation
+ */
 export const useRegister = () => {
   const router = useRouter();
-  const mutation = useMutation({
-    mutationFn: async ({ newUser }: { newUser: NewUser }) => {
-      const res = await register({ newUser: newUser });
+  return useMutation({
+    mutationFn: async ({ newUser }: RegisterData) => {
+      const res = await register({ newUser });
       router.push("/");
       return res;
     },
   });
-  return mutation;
 };
 
+/**
+ * Hook for handling user logout
+ * @returns Mutation object for logout operation
+ */
 export const useLogout = () => {
   const router = useRouter();
-  const queryClient = new QueryClient();
-  const mutation = useMutation({
+  const queryClient = useQueryClient();
+
+  return useMutation({
     mutationFn: async () => {
       const res = await logout();
       router.push("/login");
@@ -53,34 +72,38 @@ export const useLogout = () => {
       return res;
     },
   });
-  return mutation;
 };
 
+/**
+ * Hook for fetching current user data
+ * @returns Query object containing user data
+ */
 export const getSelf = () => {
-  const query = useQuery({
+  return useQuery({
     queryKey: ["getSelf"],
-    queryFn: async () => {
-      const res = await validateUserSession();
-      return res;
-    },
-    staleTime: 1000 * 30, // 30 Sekunden
+    queryFn: validateUserSession,
+    staleTime: 1000 * 30, // 30 seconds
   });
-  return query;
 };
 
+/**
+ * Hook for checking authentication status
+ * @returns Object containing authentication status
+ */
 export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const checkAuth = () => {
-      const cookies = parseCookies();
-      const sessionToken = cookies.sessionToken;
+      const { sessionToken } = parseCookies();
       setIsAuthenticated(!!sessionToken);
     };
 
+    // Initial check
     checkAuth();
 
-    const interval = setInterval(checkAuth, 1000);
+    // Check every 5 seconds instead of every second
+    const interval = setInterval(checkAuth, 5000);
 
     return () => clearInterval(interval);
   }, []);

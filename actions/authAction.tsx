@@ -11,6 +11,48 @@ import { v4 as uuidv4 } from "uuid";
 
 import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
+import { z } from "zod";
+
+// Input validation schemas
+const emailSchema = z.string().email("Invalid email format");
+const passwordSchema = z
+  .string()
+  .min(8, "Password must be at least 8 characters")
+  .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+  .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+  .regex(/[0-9]/, "Password must contain at least one number")
+  .regex(
+    /[^A-Za-z0-9]/,
+    "Password must contain at least one special character"
+  );
+
+const userSchema = z.object({
+  email: emailSchema,
+  password: z.string().min(4, "Password must be at least 4 characters"),
+  first_name: z.string().min(1, "First name is required"),
+  last_name: z.string().min(1, "Last name is required"),
+});
+
+// Security constants
+const SESSION_EXPIRY = 1000 * 60 * 60; // 1 hour
+
+/**
+ * Validates and sanitizes user input
+ */
+function validateInput<T>(schema: z.ZodSchema<T>, data: unknown): T {
+  try {
+    return schema.parse(data);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      throw {
+        name: "validation",
+        message: error.errors[0].message,
+        statusCode: 400,
+      };
+    }
+    throw error;
+  }
+}
 
 // done
 
@@ -27,11 +69,16 @@ export async function register({ newUser }: { newUser: NewUser }) {
   const supabase = await createClient();
 
   try {
-    if (!newUser.password) {
+    // Validate user input
+    // const validatedUser = validateInput(userSchema, newUser);
+
+    // Check if user already exists
+    const existingUser = await getUserByEmail({ email: newUser.email! });
+    if (existingUser) {
       throw {
         name: "auth",
-        message: "no password got submitted",
-        statusCode: 500,
+        message: "User with this email already exists",
+        statusCode: 409,
       };
     }
 
@@ -45,9 +92,9 @@ export async function register({ newUser }: { newUser: NewUser }) {
       throw roleError;
     }
 
-    const hashedPassword = await bcrypt.hash(newUser.password, 10);
+    const hashedPassword = await bcrypt.hash(newUser.password!, 12); // Increased salt rounds
 
-    newUser = {
+    const userToCreate = {
       ...newUser,
       role_id: roleData.id,
       password: hashedPassword,
@@ -55,7 +102,7 @@ export async function register({ newUser }: { newUser: NewUser }) {
 
     const { data: createUserData, error: createUserError } = await supabase
       .from("user")
-      .insert(newUser)
+      .insert(userToCreate)
       .select("*, role:role_id(*)")
       .single();
 
@@ -70,8 +117,10 @@ export async function register({ newUser }: { newUser: NewUser }) {
     if (sessionError) {
       throw sessionError;
     }
-    return { message: "You are now registered" };
+
+    return { message: "Registration successful" };
   } catch (error) {
+    console.error("Registration error:", error);
     throw error;
   }
 }
@@ -83,20 +132,19 @@ export async function login({
   email: string;
   password: string;
 }) {
+  const supabase = await createClient();
+
   try {
-    if (!email || !password) {
-      throw {
-        name: "auth",
-        message: "missing user information",
-        statusCode: 500,
-      };
-    }
-    const userData = await getUserByEmail({ email: email });
+    // Validate input
+    validateInput(emailSchema, email);
+    // validateInput(passwordSchema, password);
+
+    const userData = await getUserByEmail({ email });
     if (!userData?.password) {
       throw {
         name: "auth",
-        message: "no User found",
-        statusCode: 500,
+        message: "Invalid credentials",
+        statusCode: 401,
       };
     }
 
@@ -104,8 +152,8 @@ export async function login({
     if (!rightPassword) {
       throw {
         name: "auth",
-        message: "Wrong Email or Password",
-        statusCode: 500,
+        message: "Invalid credentials",
+        statusCode: 401,
       };
     }
 
@@ -113,12 +161,14 @@ export async function login({
     if (sessionRes.error) {
       throw {
         name: "auth",
-        message: "Unable to create Session",
+        message: "Unable to create session",
         statusCode: 500,
       };
     }
-    return { message: "You are now logged in" };
+
+    return { message: "Login successful" };
   } catch (error) {
+    console.error("Login error:", error);
     throw error;
   }
 }
@@ -128,17 +178,19 @@ export async function logout() {
   try {
     const sessionToken = await cookie.get("sessionToken");
     if (!sessionToken?.value) {
-      throw {
-        name: "auth",
-        message: "no Session token found that means you are already logged out",
-        statusCode: 500,
-      };
+      return { message: "Already logged out" };
     }
 
+    // Invalidate session in database
+    const supabase = await createClient();
+    await supabase.from("session").delete().eq("token", sessionToken.value);
+
+    // Clear cookie
     cookie.delete("sessionToken");
 
-    return { message: "You have been logged out" };
+    return { message: "Logout successful" };
   } catch (error) {
+    console.error("Logout error:", error);
     throw error;
   }
 }
@@ -155,7 +207,7 @@ export async function getUserByEmail({
       .from("user")
       .select("*, role:role_id(*)")
       .eq("email", email)
-      .single();
+      .maybeSingle();
     if (UserError) {
       throw UserError;
     }
@@ -221,19 +273,12 @@ export async function createSession({ user_id }: { user_id: string }) {
   const supabase = await createClient();
 
   const token: string = uuidv4();
-  const expiration_date = new Date(Date.now() + 1000 * 60 * 60);
+  const expiration_date = new Date(Date.now() + SESSION_EXPIRY);
 
   const newSession: NewSession = {
     expiration_date: expiration_date.toISOString(),
     token: token,
     user_id: user_id,
-  };
-
-  const cookieOptions = {
-    name: "sessionToken",
-    value: token,
-    expires: expiration_date,
-    path: "/",
   };
 
   const { error: createSessionError } = await supabase
@@ -246,7 +291,14 @@ export async function createSession({ user_id }: { user_id: string }) {
     return { error: true };
   }
 
-  cookie.set(cookieOptions);
+  // Set cookie
+  cookie.set({
+    name: "sessionToken",
+    value: token,
+    expires: expiration_date,
+    path: "/",
+  });
+
   return { error: false };
 }
 

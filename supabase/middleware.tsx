@@ -4,11 +4,43 @@ import { validateUserSession } from "@/actions/authAction";
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+// Route type definitions
+type PublicRoute = "/login" | "/register";
+type RestrictedRoute = "/dashboard" | "/team" | "/comments" | "/departments";
+type ProtectedAuthRoute = "/login" | "/register" | "/";
+
+// Route configurations
+const ROUTES = {
+  PUBLIC: ["/login", "/register"] as PublicRoute[],
+  RESTRICTED: [
+    "/dashboard",
+    "/team",
+    "/comments",
+    "/departments",
+  ] as RestrictedRoute[],
+  PROTECTED_AUTH: ["/login", "/register", "/"] as ProtectedAuthRoute[],
+} as const;
+
+// Role definitions
+const ROLES = {
+  SUPERADMIN: "Superadmin",
+  ADMIN: "Admin",
+  USER: "User",
+} as const;
+
+type Role = (typeof ROLES)[keyof typeof ROLES];
+
+/**
+ * Updates the session and handles route protection based on user authentication and roles
+ * @param request The incoming Next.js request
+ * @returns NextResponse with appropriate redirects or next() response
+ */
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   });
 
+  // Initialize Supabase client
   createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -18,80 +50,66 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            request.cookies.set(name, value)
-          );
+          cookiesToSet.forEach(({ name, value, options }) => {
+            request.cookies.set(name, value);
+            supabaseResponse.cookies.set(name, value, options);
+          });
           supabaseResponse = NextResponse.next({
             request,
           });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
         },
       },
     }
   );
 
-  // Do not run code between createServerClient and supabase.auth.getUser()
   const user = await validateUserSession();
-  const publicRoutes = [
-    // "/",
-    // "/about",
-    // "/contact",
-    // "/api/public",
+  const currentPath = request.nextUrl.pathname as
+    | PublicRoute
+    | RestrictedRoute
+    | ProtectedAuthRoute;
+  const userRole = user?.user?.role?.name as Role | undefined;
 
-    "/login",
-    "/register",
-  ];
-
-  const restrictedUserRoutes = [
-    // "/",
-    "/dashboard",
-    "/team",
-    "/comments",
-    "/departments",
-  ];
-
-  const protectedAuthRoutes = ["/login", "/register", "/"];
-
-  const isPublicRoute = publicRoutes.includes(request.nextUrl.pathname);
-
-  if (user?.user?.role?.name) {
-    supabaseResponse.headers.set("X-User-Role", user.user.role.name);
+  // Set user role in headers if available
+  if (userRole) {
+    supabaseResponse.headers.set("X-User-Role", userRole);
   }
 
-  if (!user.authorized && !isPublicRoute) {
-    // Kein Benutzer vorhanden und Route ist nicht public -> Umleitung zur Login-Seite
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
+  // Handle unauthorized access to protected routes
+  if (!user.authorized && !ROUTES.PUBLIC.includes(currentPath as PublicRoute)) {
+    return redirectTo("/login", request);
   }
 
-  const isProtectedAuthRoute = protectedAuthRoutes.includes(
-    request.nextUrl.pathname
-  );
-  const isRestrictedUserRoutes = restrictedUserRoutes.includes(
-    request.nextUrl.pathname
-  );
-
-  if (user.authorized && isProtectedAuthRoute) {
-    if (
-      (user?.user?.role?.name && user.user.role.name === "Superadmin") ||
-      (user?.user?.role?.name && user.user.role.name === "Admin")
-    ) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/dashboard";
-      return NextResponse.redirect(url);
+  // Handle authenticated user access to auth routes
+  if (
+    user.authorized &&
+    ROUTES.PROTECTED_AUTH.includes(currentPath as ProtectedAuthRoute)
+  ) {
+    if (userRole === ROLES.SUPERADMIN || userRole === ROLES.ADMIN) {
+      return redirectTo("/dashboard", request);
     }
   }
 
-  if (user.authorized && isRestrictedUserRoutes) {
-    if (user?.user?.role?.name && user.user.role.name === "User") {
-      const url = request.nextUrl.clone();
-      url.pathname = "/";
-      return NextResponse.redirect(url);
+  // Handle restricted routes access
+  if (
+    user.authorized &&
+    ROUTES.RESTRICTED.includes(currentPath as RestrictedRoute)
+  ) {
+    if (userRole === ROLES.USER) {
+      return redirectTo("/", request);
     }
   }
 
   return supabaseResponse;
+}
+
+/**
+ * Helper function to create a redirect response
+ * @param path The path to redirect to
+ * @param request The original request
+ * @returns NextResponse with redirect
+ */
+function redirectTo(path: string, request: NextRequest): NextResponse {
+  const url = request.nextUrl.clone();
+  url.pathname = path;
+  return NextResponse.redirect(url);
 }
