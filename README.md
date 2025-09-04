@@ -20,6 +20,7 @@ Work Balance ist eine Webanwendung zur Erfassung und Analyse von Stressleveln am
 - Node.js (>= 18.x)
 - npm (>= 9.x)
 - Supabase CLI
+- docker
 
 ### Installationsanleitung
 
